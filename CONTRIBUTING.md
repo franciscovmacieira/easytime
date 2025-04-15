@@ -1,8 +1,3 @@
-# Contributing
-
-Contributions are welcome, and they are greatly appreciated! Every little bit
-helps, and credit will always be given.
-
 ## Types of Contributions
 
 ### Report Bugs
@@ -36,14 +31,14 @@ If you are proposing a feature:
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
 * Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
+    are welcome :)
 
 ## Get Started!
 
-Ready to contribute? Here's how to set up `audinter` for local development.
+Ready to contribute? Here's how to set up `EasyTest` for local development.
 
-1. Download a copy of `audinter` locally.
-2. Install `audinter` using `poetry`:
+1. Download a copy of `EasyTest` locally.
+2. Install `EasyTest` using `poetry`:
 
     ```console
     $ poetry install
@@ -66,8 +61,3 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include additional tests if appropriate.
 2. If the pull request adds functionality, the docs should be updated.
 3. The pull request should work for all currently supported operating systems and versions of Python.
-
-## Code of Conduct
-
-Please note that the `audinter` project is released with a
-Code of Conduct. By contributing to this project you agree to abide by its terms.

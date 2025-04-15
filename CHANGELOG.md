@@ -2,6 +2,6 @@
 
 <!--next-version-placeholder-->
 
-## v0.1.0 (25/07/2024)
+## v0.1.0 (15/04/2025)
 
-- First release of `audinter`!
+- First release of `EasyTest`!

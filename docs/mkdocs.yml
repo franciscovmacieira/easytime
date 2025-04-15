@@ -1,0 +1,22 @@
+site_name: EasyTest
+nav:
+    - Home: index.md
+    - Changelog: changelog.md
+    - Contributing: contributing.md
+    - Code of Conduct: conduct.md
+    - API Reference: api/index.md
+theme: mkdocs
+
+plugins:
+    - search  # Enables the built-in search functionality
+
+markdown_extensions:
+    - admonitions
+    - codehilite:
+          guess_lang: false
+    - toc:
+          permalink: true
+    - meta
+
+extra:
+    copyright: '&copy; 2025 Francisco Macieira' # Update copyright info

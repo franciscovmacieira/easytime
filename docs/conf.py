@@ -6,9 +6,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"audinter"
-copyright = u"2024, Antónia Brito"
-author = u"Antónia Brito"
+project = u"EasyTest"
+copyright = u"2025, Francisco Macieira"
+author = u"Francisco Macieira"
 
 # -- General configuration ---------------------------------------------------
 

@@ -1,15 +1,23 @@
 [tool.poetry]
-name = "audinter"
+name = "EasyTest"
 version = "0.1.0"
-description = "Interpretability and complexity metrics for ML models."
-authors = ["Antónia Brito"]
+description = "A Python library for the analysis of time-series data."
+authors = ["Francisco Macieira francisco.v.macieira@gmail.com"] # Replace with your actual name and email
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pandas = "^2.2"       # Example: Likely you'll depend on pandas
+numpy = "^1.26"        # Example: Likely you'll depend on numpy
+# Add other core dependencies for time-series analysis here
+# Example: statsmodels = "^0.14"
 
 [tool.poetry.dev-dependencies]
+pytest = "^7.1"
+# Add other development dependencies (testing, linting, formatting) here
+# Example: black = "^23.10"
+# Example: flake8 = "^6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

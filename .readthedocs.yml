@@ -17,7 +17,8 @@ build:
       - pip install poetry
     post_install:
       - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install
-      
-# Build documentation in the "docs/" directory with Sphinx
-sphinx:
-  configuration: docs/conf.py
+
+# Build documentation with MkDocs in the "docs/" directory
+mkdocs:
+  configuration: mkdocs.yml
+  directory: docs
