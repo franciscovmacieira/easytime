@@ -11,7 +11,8 @@ plugins:
     - search  # Enables the built-in search functionality
 
 markdown_extensions:
-    - admonitions
+    - admonitions # You can try keeping this, or remove it
+    - pymdownx.admonition
     - codehilite:
           guess_lang: false
     - toc:
