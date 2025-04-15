@@ -1,0 +1,6 @@
+numpy==1.26.4
+statsmodels==0.14.1
+typing-extensions>=4.5.0  
+ruptures
+datasetsforecast==1.0.0
+pandas==2.2.3

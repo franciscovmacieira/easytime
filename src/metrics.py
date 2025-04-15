@@ -1,318 +1,439 @@
-import copy
+from statsmodels.tsa.seasonal import STL
+from statsmodels.nonparametric import _smoothers_lowess
+from statsmodels.regression.linear_model import OLS
+from statsmodels.tools.tools import add_constant
+from typing import Dict, List
+from math import floor
+from ruptures.base import BaseEstimator
+from ruptures.costs import cost_factory
 import numpy as np
-import pandas as pd
-import shap
-import tensorflow as tf
-import torch.nn as nn
-from difflib import get_close_matches
 
 
-def algorithm_class_score(model, show_model_type=False):
+class Pelt(BaseEstimator):
     """
-    Calculate a score for a given classifier based on a predefined scoring system.
-    
-    Parameters:
-    model : object
-        The classifier object for which the score is to be calculated.
-    show_model_type : bool, optional
-        If True, prints the name of the classifier. Default is False.
+    Penalized change point detection.
 
-    Returns:
-    (float, description)
-        A normalized score (between 0 and 1) representing the quality or 
-        expected performance of the classifier, or None if the classifier 
-        type is not recognized.
+    For a given model and penalty level, computes the segmentation which minimizes the constrained
+    sum of approximation errors.
     """
 
-    # Dictionary mapping classifier names to their respective scores
-    # https://github.com/ningxie1991/FederatedTrust/blob/develop/federatedTrust/configs/eval_metrics_v1.json
-    alg_score = {
-        "RandomForestClassifier": 4,
-        "KNeighborsClassifier": 3,
-        "SVC": 2,
-        "GaussianProcessClassifier": 3,
-        "DecisionTreeClassifier": 5,
-        "MLPClassifier": 1,
-        "AdaBoostClassifier": 3,
-        "GaussianNB": 3.5,
-        "QuadraticDiscriminantAnalysis": 3,
-        "LogisticRegression": 4,
-        "LinearRegression": 3.5,
-    }
+    def __init__(self, model="l2", custom_cost=None, min_size=2, jump=5, params=None):
+        """
+        Initialize a Pelt instance.
 
-    # Get the name of the classifier class
-    model_name = type(model).__name__
-    description = "Level of explainability based on on literature research and qualitative analysis of each learning technique."
+        Args:
+            model (str, optional): segment model, ["l1", "l2", "rbf"].
+                Not used if ``'custom_cost'`` is not None.
+            custom_cost (BaseCost, optional): custom cost function. Defaults to None.
+            min_size (int, optional): minimum segment length.
+            jump (int, optional): subsample (one every *jump* points).
+            params (dict, optional): a dictionary of parameters for the cost instance.
 
-    if show_model_type: 
-        print(model_name)
+        Returns:
+            self
+        """
+        if custom_cost is not None and isinstance(custom_cost, BaseCost):
+            self.cost = custom_cost
+        else:
+            if params is None:
+                self.cost = cost_factory(model=model)
+            else:
+                self.cost = cost_factory(model=model, **params)
+        self.min_size = max(min_size, self.cost.min_size)
+        self.jump = jump
+        self.n_samples = None
 
-    # Check if the classifier name is in the alg_score dictionary
-    if model_name in alg_score:
-        exp_score = alg_score[model_name]
-        return exp_score, description
+    def _seg(self, pen: float) -> Dict[str, List[int]]:
+        """
+        Computes the segmentation for a given penalty using PELT.
 
-    # Check if the classifier is a type of neural network
-    if isinstance(model, tf.keras.Model) or isinstance(model, tf.Module) or isinstance(model, nn.Module):
-        return 1, description  # Return a normalized score of 0.2 for neural networks
-    
-    # If classifier name is not found, try to find a close match
-    close_matches = get_close_matches(model_name, alg_score.keys(), n=1, cutoff=0.6)
-    if close_matches:
-        exp_score = alg_score[close_matches[0]]
-        return exp_score, description 
-    
-    # If no match is found, return None
-    description =  f"No matching score found for '{model_name}'!"
-    return None, description
+        Args:
+            pen (float): penalty value
+
+        Returns:
+        dict: A dictionary containing the breakpoints.  For consistency,
+                we return a dictionary.
+        """
+        # initialization
+        partitions = dict()
+        partitions[0] = {(0, 0): 0}
+        admissible = []
+
+        # Recursion
+        ind = [
+            k for k in range(0, self.n_samples, self.jump) if k >= self.min_size]
+        ind += [self.n_samples]
+        for bkp in ind:
+            # adding a point to the admissible set from the previous loop.
+            new_adm_pt = floor((bkp - self.min_size) / self.jump)
+            new_adm_pt *= self.jump
+            admissible.append(new_adm_pt)
+
+            subproblems = list()
+            for t in admissible:
+                # left partition
+                try:
+                    tmp_partition = partitions[t].copy()
+                except KeyError:  # no partition of 0:t exists
+                    continue
+                # we update with the right partition
+                tmp_partition.update({(t, bkp): self.cost.error(t, bkp) + pen})
+                subproblems.append(tmp_partition)
+
+            # finding the optimal partition
+            partitions[bkp] = min(
+                subproblems, key=lambda d: sum(d.values()))
+            # trimming the admissible set
+            admissible = [t for t, partition in
+                          zip(admissible, subproblems) if
+                          sum(partition.values()) <=
+                          sum(partitions[bkp].values()) + pen]
+
+        best_partition = partitions[self.n_samples]
+        del best_partition[(0, 0)]  # Remove the initial (0,0) "breakpoint"
+        bkps = sorted(e for s, e in best_partition.keys())
+
+        return {'breakpoints': bkps}  # Changed to return a dict
+
+    def fit(self, signal: np.ndarray) -> 'Pelt':
+        """
+        Set params.
+
+        Args:
+            signal (array): signal to segment.
+                Shape (n_samples, n_features) or (n_samples,).
+
+        Returns:
+            self
+        """
+        # update params
+        self.cost.fit(signal)
+        if signal.ndim == 1:
+            n_samples, = signal.shape
+        else:
+            n_samples, _ = signal.shape
+        self.n_samples = n_samples
+        return self
+
+    def predict(self, pen: float) -> List[int]:
+        """
+        Return the optimal breakpoints.
+
+        Must be called after the fit method.
+        The breakpoints are associated with the signal passed to fit().
+
+        Args:
+            pen (float): penalty value (>0)
+
+        Returns:
+            list: sorted list of breakpoints
+        """
+        partition = self._seg(pen)
+        return partition['breakpoints']  # changed to return the breakpoints list
+
+    def fit_predict(self, signal: np.ndarray, pen: float) -> List[int]:
+        """
+        Fit to the signal and return the optimal breakpoints.
+
+        Helper method to call fit and predict once
+
+        Args:
+            signal (array): signal. Shape (n_samples, n_features) or (n_samples,).
+            pen (float): penalty value (>0)
+
+        Returns:
+            list: sorted list of breakpoints
+        """
+        self.fit(signal)
+        return self.predict(pen)
+
+    def get_features(self, signal: np.ndarray, pen: float) -> Dict[str, List[int]]:
+        """
+        Calculate Pelt features (breakpoints).  This is the key change
+        to make Pelt consistent with other feature extractors.
+
+        Args:
+            signal (np.ndarray): The input time series signal.
+            pen (float): Penalty parameter for PELT.
+
+        Returns:
+            Dict[str, List[int]]: A dictionary with a single key
+            'breakpoints' and the corresponding list of breakpoints.
+        """
+        self.fit(signal)  # Ensure the model is fitted.
+        breakpoints = self.predict(pen)  # Get the breakpoints
+        return {'breakpoints': breakpoints}  # Return in the desired format
 
 
-def correlated_features_score(dataset, target_column=None, show_high_corr_feat=False):
+
+class STLFeatures:
     """
-    Calculate a score based on the proportion of highly correlated features in a dataset.
-    
-    Parameters:
-    dataset : pandas.DataFrame or array-like
-        The input dataset containing features and possibly a target column.
-    target_column : str, optional
-        The name of the target column to be excluded from the correlation analysis. 
-        If None, the last column of the dataset is assumed to be the target.
-    show_high_corr_feat : bool, optional
-        If True, prints the names of the removed features due to high correlation. Default is False.
-
-    Returns:
-    (float, description)
-        A score representing the proportion of features that are not highly correlated. 
-        The score ranges from 0 to 1, where 1 means no features were removed due to high correlation.
+    Calculates seasonal trend using loess decomposition.
     """
-    # Ensure the dataset is a pandas DataFrame
-    if type(dataset) != 'pandas.core.frame.DataFrame':
-        dataset = pd.DataFrame(dataset)
+    def __init__(self, freq: int = 1):
+        """
+        Initialize the STLFeatures class.
 
-    # Make a deep copy of the dataset to avoid modifying the original data
-    dataset = copy.deepcopy(dataset)
-    
-    # Exclude the target column from the features to be analyzed
-    if target_column:
-        X_test = dataset.drop(target_column, axis=1)
-    else:
-        X_test = dataset.iloc[:, :-1]
+        Args:
+            freq (int, optional): Frequency of the time series. Defaults to 1.
+        """
+        self.freq = freq
 
-    # Retain only numeric data for correlation analysis
-    X_test = X_test._get_numeric_data()
-    # Compute the absolute correlation matrix
-    corr_matrix = X_test.corr().abs()
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """
+        Calculates STL features.
 
-    # Select the upper triangle of the correlation matrix to avoid duplicate pairs
-    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool_))
-    
-    # Compute the average and standard deviation of the correlations in the upper triangle
-    avg_corr = upper.values[np.triu_indices_from(upper.values, 1)].mean()
-    std_corr = upper.values[np.triu_indices_from(upper.values, 1)].std()
+        Args:
+            x (numpy array): The time series.
 
-    # Identify features with correlations greater than avg_corr + std_corr
-    to_drop = [column for column in upper.columns if any(upper[column] > (avg_corr + std_corr))]
-    if show_high_corr_feat: 
-        print(f"Features with high correlation: {to_drop}")
-    
-    # Calculate the proportion of features removed due to high correlation
-    pct_drop = len(to_drop) / len(X_test.columns)
-    description = "Proportion of non-highly correlated features, correlation lesser than avg_corr + std_corr."
-    return (round(1 - pct_drop, 2)), description  
+        Returns:
+        dict: A dictionary containing the STL features.
+        """
+        m = self.freq
+        nperiods = int(m > 1)
+        # STL fits
+        if m > 1:
+            try:
+                stlfit = STL(x, m, 13).fit()
+            except:
+                output = {
+                    'nperiods': nperiods,
+                    'seasonal_period': m,
+                    'trend': np.nan,
+                    'spike': np.nan,
+                    'linearity': np.nan,
+                    'curvature': np.nan,
+                    'e_acf1': np.nan,
+                    'e_acf10': np.nan,
+                    'seasonal_strength': np.nan,
+                    'peak': np.nan,
+                    'trough': np.nan
+                }
 
+                return output
 
-def model_size(model, test_dataset=None):
+            trend0 = stlfit.trend
+            remainder = stlfit.resid
+            seasonal = stlfit.seasonal
+        else:
+            deseas = x
+            t = np.arange(len(x)) + 1
+            try:
+                trend0 = _smoothers_lowess().fit(t, deseas).predict(t)
+            except:
+                output = {
+                    'nperiods': nperiods,
+                    'seasonal_period': m,
+                    'trend': np.nan,
+                    'spike': np.nan,
+                    'linearity': np.nan,
+                    'curvature': np.nan,
+                    'e_acf1': np.nan,
+                    'e_acf10': np.nan
+                }
+
+                return output
+
+            remainder = deseas - trend0
+            seasonal = np.zeros(len(x))
+        # De-trended and de-seasonalized data
+        detrend = x - trend0
+        deseason = x - seasonal
+        fits = x - remainder
+        # Summay stats
+        n = len(x)
+        varx = np.nanvar(x, ddof=1)
+        vare = np.nanvar(remainder, ddof=1)
+        vardetrend = np.nanvar(detrend, ddof=1)
+        vardeseason = np.nanvar(deseason, ddof=1)
+        # Measure of trend strength
+        if varx < np.finfo(float).eps:
+            trend = 0
+        elif (vardeseason / varx < 1e-10):
+            trend = 0
+        else:
+            trend = max(0, min(1, 1 - vare / vardeseason))
+        # Measure of seasonal strength
+        if m > 1:
+            if varx < np.finfo(float).eps:
+                season = 0
+            elif np.nanvar(remainder + seasonal, ddof=1) < np.finfo(float).eps:
+                season = 0
+            else:
+                season = max(0, min(1, 1 - vare / np.nanvar(remainder + seasonal, ddof=1)))
+
+            peak = (np.argmax(seasonal) + 1) % m
+            peak = m if peak == 0 else peak
+
+            trough = (np.argmin(seasonal) + 1) % m
+            trough = m if trough == 0 else trough
+        # Compute measure of spikiness
+        d = (remainder - np.nanmean(remainder)) ** 2
+        varloo = (vare * (n - 1) - d) / (n - 2)
+        spike = np.nanvar(varloo, ddof=1)
+        # Compute measures of linearity and curvature
+        time = np.arange(n) + 1
+        poly_m = poly(time, 2)
+        time_x = add_constant(poly_m)
+        coefs = OLS(trend0, time_x).fit().params
+
+        try:
+            linearity = coefs[1]
+        except:
+            linearity = np.nan
+        try:
+            curvature = -coefs[2]
+        except:
+            curvature = np.nan
+        # ACF features
+        acf_obj = ACF_Features(freq=m) #instantiate the ACF_Features class
+        acfremainder = acf_obj.get_features(remainder)
+        # Assemble features
+        output = {
+            'nperiods': nperiods,
+            'seasonal_period': m,
+            'trend': trend,
+            'spike': spike,
+            'linearity': linearity,
+            'curvature': curvature,
+            'e_acf1': acfremainder['x_acf1'],
+            'e_acf10': acfremainder['x_acf10']
+        }
+
+        if m > 1:
+            output['seasonal_strength'] = season
+            output['peak'] = peak
+            output['trough'] = trough
+
+        return output
+
+def poly(t: np.ndarray, degree: int) -> np.ndarray:
+    """Computes a polynomial of a given degree.
+
+    Parameters
+    ----------
+    t: numpy array
+        The time series.
+    degree: int
+        Degree of the polynomial
+
+    Returns
+    -------
+    numpy array
+        Polynomial of given degree
     """
-    Calculate the size of a machine learning model based on its type.
-    
-    Parameters:
-    model : object
-        The machine learning model whose size needs to be determined.
-    test_dataset : array-like, optional
-        A test dataset to be used for certain types of models.
+    n = len(t)
+    T = np.zeros((n, degree + 1))
+    for i in range(degree + 1):
+        T[:, i] = t ** i
+    return T
 
-    Returns:
-    (int, description)
-        The size of the model, which can be the number of parameters, 
-        the number of nodes, the number of support vectors, or the 
-        number of features seen in fit, depending on the model type.
+
+
+class ACF_Features:
     """
-    
-    # If the model is a TensorFlow Keras Model, return the count of parameters
-    if isinstance(model, tf.keras.Model):
-        description = "Returned number of parameters."
-        return model.count_params(), description
-    
-    # If the model is a TensorFlow Module or PyTorch Module, return the sum of parameters
-    elif isinstance(model, tf.Module) or isinstance(model, nn.Module):
-        description = "Returned number of parameters."
-        return sum(p.numel() for p in model.parameters()), description
-    
-    # If the model has 'estimators_', typically an ensemble model like RandomForest
-    elif hasattr(model, 'estimators_'):
-        count = 0
-        for i, est in enumerate(model.estimators_):
-            # If the estimator has a tree structure, add the number of nodes
-            if hasattr(est, 'tree_'):
-                description = "Returned number of total nodes."
-                count += est.tree_.node_count
-
-            # If the estimator has support vectors, add their count
-            elif hasattr(est, 'n_support_'):
-                description = "Returned number of total support vectors."
-                count += sum(est.n_support_)
-        return count, description
-    
-    # If the model is a Support Vector Classifier
-    elif hasattr(model, 'SVC'):
-        description = "Returned number of support vectors."
-        return sum(model.n_support_), description
-
-    # If the model has a tree structure, return the number of nodes
-    elif hasattr(model, 'tree_'):
-        description = "Returned number of nodes."
-        return model.tree_.node_count, description
-    
-    # Return the number of features seen during fit if applicable
-    elif hasattr(model, 'n_features_in_'):
-        description = "Returned number of features seen during fit."
-        return model.n_features_in_, description
-    
-    # If a test dataset is provided, return the number of features in the dataset
-    elif test_dataset is not None:
-        description = "Returned number of features in test_dataset."
-        return test_dataset.shape[1], description
-    
-    # If none of the above conditions are met, return None
-    else:
-        description = "Unable to determine model size!"
-        return None, description
-
-
-def feature_importance_score(model):
+    Calculates the autocorrelation coefficients
     """
-    Calculate the feature importance score for a given classifier.
-    
-    Parameters:
-    model : object
-        The classifier whose feature importance needs to be calculated.
+    def __init__(self, freq: int = 1):
+        """
+        Initialize the ACF_Features class.
 
-    Returns:
-    (float, description)
-        The percentage of features that concentrate a specified threshold 
-        of the total importance, or None if the classifier type is not supported.
+        Args:
+            freq (int, optional): Frequency of the time series. Defaults to 1.
+        """
+        self.freq = freq
+
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """
+        Calculates the autocorrelation coefficients
+
+        Parameters
+        ----------
+        x: numpy array
+            The time series.
+
+        Returns
+        -------
+        dict
+            'x_acf1': First autocorrelation coefficient
+            'x_acf10': Sum of the first 10 autocorrelation coefficients
+        """
+        from statsmodels.tsa.stattools import acf
+        acf_values = acf(x, nlags=10)
+        acf1 = acf_values[1]
+        acf10 = acf_values[1:11].sum()
+        return {'x_acf1': acf1, 'x_acf10': acf10}
+
+
+
+class CrossingPoints:
     """
-    distri_threshold = 0.5  # Threshold for cumulative distribution of feature importance
-
-    # Lists of model names for regression and classification
-    regression = ['LogisticRegression', 'LogisticRegression']  # Likely a typo, should be ['LogisticRegression']
-    classifier = ['RandomForestClassifier', 'DecisionTreeClassifier']
-
-    # Check if the classifier is a regression model
-    if (type(model).__name__ in regression) or (get_close_matches(type(model).__name__, regression, n=1, cutoff=0.6)):
-        # Get the feature importance for regression models (coefficients)
-        importance = model.coef_.flatten()
-
-        # Normalize the importance values to sum to 1
-        total = 0
-        for i in range(len(importance)):
-            total += abs(importance[i])
-
-        for i in range(len(importance)):
-            importance[i] = abs(importance[i]) / total
-
-    # Check if the classifier is a classification model
-    elif (type(model).__name__ in classifier) or (get_close_matches(type(model).__name__, classifier, n=1, cutoff=0.6)):
-        # Get the feature importance for classification models
-        importance = model.feature_importances_
-    
-    else:
-        description = "Classifier type is not applicable!"
-        return None, description  
-
-    # Sort the importance values in descending order
-    indices = np.argsort(importance)[::-1]
-    importance = importance[indices]
-    
-    # Calculate the percentage of features that concentrate distri_threshold percent of the total importance
-    pct_dist = sum(np.cumsum(importance) < distri_threshold) / len(importance)
-    
-    description = f"Percentage of features that concentrate distri_threshold ({distri_threshold}) percent of the total importance."
-    return pct_dist, description
-
-
-def predict(model):
+    Calculates the number of times a time series crosses its median.
     """
-    Get the prediction function of a model.
-    
-    Parameters:
-    model : object
-        The machine learning model.
+    def __init__(self, freq: int = 1):
+        """
+        Initialize the CrossingPoints class.
 
-    Returns:
-    function
-        The model's probability prediction function if available, 
-        otherwise the standard prediction function.
+        Args:
+            freq (int, optional): Frequency of the time series. Defaults to 1.
+        """
+        self.freq = freq
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """Crossing points.
+
+        Parameters
+        ----------
+        x: numpy array
+            The time series.
+
+        Returns
+        -------
+        dict
+            'crossing_points': Number of times that x crosses the median.
+        """
+        midline = np.median(x)
+        ab = x <= midline
+        lenx = len(x)
+        p1 = ab[:(lenx - 1)]
+        p2 = ab[1:]
+        cross = (p1 & (~p2)) | (p2 & (~p1))
+
+        return {'crossing_points': cross.sum()}
+
+class LinearRegression:
     """
-    return model.predict_proba if hasattr(model, 'predict_proba') else model.predict
+    Performs linear regression on time series data.
 
-
-def cv_shap_score(model, test_dataset):
+    This class calculates the linear regression of a time series against time
+    (i.e., it fits a line to the data) and returns the slope, intercept,
+    and R-squared value.
     """
-    Calculate the coefficient of variation (CV) of SHAP values for a classifier.
-    
-    Parameters:
-    model : object
-        The classifier for which SHAP values are to be calculated.
-    test_dataset : pandas.DataFrame
-        The test_dataset for which SHAP values are to be calculated.
 
-    Returns:
-    (float, description)
-        The coefficient of variation of the absolute SHAP values, 
-        or None if SHAP values cannot be calculated.
-    """
-    if type(test_dataset) != 'pandas.core.frame.DataFrame':
-        test_dataset = pd.DataFrame(test_dataset)
+    def get_features(self, time_series: np.ndarray) -> Dict[str, float]:
+        """
+        Calculates linear regression features for a time series.
 
-    # Create a background dataset by sampling 100 samples from the provided test_dataset
-    background = shap.sample(test_dataset, 100)
+        Args:
+            time_series (np.ndarray): The input time series data.
 
-    # Initialize KernelExplainer with the prediction function and background dataset
-    explainer = shap.KernelExplainer(predict(model), background)
+        Returns:
+            Dict[str, float]: A dictionary containing the slope, intercept,
+                and R-squared value of the regression.
+        """
+        # Create the time variable (independent variable)
+        time = np.arange(len(time_series))
+        time_with_constant = add_constant(time)  # Add a constant for the intercept
 
-    # Calculate SHAP values for the first instance in the dataset
-    shap_values = explainer.shap_values(test_dataset.iloc[0])
-  
-    # Calculate the coefficient of variation of absolute SHAP values if they exist
-    if shap_values is not None and len(shap_values) > 0:
-        # Calculate the sum of absolute SHAP values for each class
-        sums = np.array([abs(shap_values[i]).sum() for i in range(len(shap_values))])
-        # Calculate the coefficient of variation (CV)
-        cv = np.std(sums) / np.mean(sums)
-        description = "Coefficient of variation of absolute SHAP values."
-        return round(cv, 3), description
-    
-    else:
-        description = "SHAP values cannot be calculated!"
-        return None, description
+        # Perform the linear regression
+        model = OLS(time_series, time_with_constant).fit()
 
-def all_metrics(model, dataset, test_dataset=None):
-    """
-    This function calculates all the explainability and complexity model auditing metrics available.
+        # Extract the parameters
+        slope = model.params[1]
+        intercept = model.params[0]
+        r_squared = model.rsquared
 
-    Parameters:
-        model (object): The machine learning model for which the metrics is to be calculated.
-        dataset (pandas.DataFrame): The input dataset containing features
-        test_dataset (pandas.DataFrame): The test data for the metrics which this parameter is required.
-
-    Returns:
-        tuple: All audinter metrics available.
-    """
-    return algorithm_class_score(model),\
-    correlated_features_score(dataset),\
-    model_size(model),\
-    feature_importance_score(model),\
-    cv_shap_score(model, test_dataset)
-
-
+        return {
+            "slope": slope,
+            "intercept": intercept,
+            "r_squared": r_squared,
+        }
