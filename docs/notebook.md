@@ -2,7 +2,9 @@
 
 
 
-This feature detects the number of points where the trend changes. A low value means the trend has few/none shifting points, and is constant through time, while a high value means the trend is constantly shifting, provoking many estrutural changes.
+This feature detects the number of points where the trend changes.  
+**Low value:** The trend has few/none shifting points, and is constant through time.  
+**High value:** The trend is constantly shifting, provoking many structural changes.
 
 
 
@@ -16,7 +18,9 @@ This feature detects the number of points where the trend changes. A low value m
 
 
 
-This feature computes the strenght of a trend within the time-series. A low value (close to zero) means there are few/none indicators of a trend in the time series while a high value (close to one) means there are strong signs of the series containing a trend.
+This feature computes the strength of a trend within the time-series.  
+**Low value:** A value close to zero means there are few/none indicators of a trend in the time series.  
+**High value:** A value close to one means there are strong signs of the series containing a trend.
 
 
 
@@ -30,7 +34,9 @@ This feature computes the strenght of a trend within the time-series. A low valu
 
 
 
-This feature measures the first 1/e crossing of the auto-correlation function, which means a low/negative value indicates negative auto-correlation while a high/positive value indicates strong auto-correlation.
+This feature measures the first 1/e crossing of the auto-correlation function.  
+**Low value:** A negative value indicates negative auto-correlation.  
+**High value:** A positive value indicates strong auto-correlation.
 
 
 
@@ -44,7 +50,9 @@ This feature measures the first 1/e crossing of the auto-correlation function, w
 
 
 
-This feature measures the overall linear trend. A low/negative value means there is a strong downward trend while a high/positive value means a strong upward trend.
+This feature measures the overall linear trend.  
+**Low value:** A negative value means there is a strong downward trend.  
+**High value:** A positive value means a strong upward trend.
 
 
 
@@ -58,7 +66,9 @@ This feature measures the overall linear trend. A low/negative value means there
 
 
 
-This feature measures the linear fit of a time-series. A low value (close to zero) means few/none linear fit while a high value (close to one) means a high linear fit.
+This feature measures the linear fit of a time-series.  
+**Low value:** A value close to zero means there is no linear fit.  
+**High value:** A value close to one means a high linear fit.
 
 
 

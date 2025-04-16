@@ -1,12 +1,11 @@
 import pandas as pd
 import numpy as np
 import time
-import sys
 import json
 import matplotlib.pyplot as plt 
 
 CUSTOM_SCRIPT_MODULE_NAME = "easytest_metrics"
-CUSTOM_FUNCTION_NAME = "test_easytest_metrics" # Assuming this is correct now
+CUSTOM_FUNCTION_NAME = "test_easytest_metrics"
 
 LIBRARY_SCRIPT_MODULE_NAME = "original_metrics"
 LIBRARY_FUNCTION_NAME = "test_original_metrics"

@@ -2,13 +2,8 @@ import numpy as np
 import pandas as pd
 import warnings
 import json
-import matplotlib.pyplot as plt
 from datasetsforecast.m3 import M3
 from src.metrics import Pelt, STLFeatures, ACF_Features, CrossingPoints, LinearRegression
-import statsmodels.api as sm
-from ruptures.base import BaseEstimator
-from ruptures.costs import cost_factory
-from math import floor
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
