@@ -1,0 +1,7 @@
+cd C:\Users\Utilizador\Desktop\Faculdade\Projeto Investigação - Séries Temporais\EasyTest
+
+.venv\Scripts\activate.bat
+
+jupyter nbconvert --to markdown --TagRemovePreprocessor.enabled=True --TagRemovePreprocessor.remove_input_tags="['remove_input','hide_input','hide-input']" "docs/notebook.ipynb" --output "notebook.md" --output-dir "docs"
+
+mkdocs build --clean

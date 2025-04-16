@@ -2,28 +2,33 @@ from statsmodels.tsa.seasonal import STL
 from statsmodels.nonparametric import _smoothers_lowess
 from statsmodels.regression.linear_model import OLS
 from statsmodels.tools.tools import add_constant
+import statsmodels.api as sm
 from typing import Dict, List
 from math import floor
 from ruptures.base import BaseEstimator
 from ruptures.costs import cost_factory
 import numpy as np
+import matplotlib.pyplot as plt
+from math import floor
+
+from ruptures.costs import cost_factory
+from ruptures.base import BaseCost, BaseEstimator
 
 
 class Pelt(BaseEstimator):
-    """
-    Penalized change point detection.
+
+    """Penalized change point detection.
 
     For a given model and penalty level, computes the segmentation which minimizes the constrained
     sum of approximation errors.
+
     """
 
     def __init__(self, model="l2", custom_cost=None, min_size=2, jump=5, params=None):
-        """
-        Initialize a Pelt instance.
+        """Initialize a Pelt instance.
 
         Args:
-            model (str, optional): segment model, ["l1", "l2", "rbf"].
-                Not used if ``'custom_cost'`` is not None.
+            model (str, optional): segment model, ["l1", "l2", "rbf"]. Not used if ``'custom_cost'`` is not None.
             custom_cost (BaseCost, optional): custom cost function. Defaults to None.
             min_size (int, optional): minimum segment length.
             jump (int, optional): subsample (one every *jump* points).
@@ -43,19 +48,21 @@ class Pelt(BaseEstimator):
         self.jump = jump
         self.n_samples = None
 
-    def _seg(self, pen: float) -> Dict[str, List[int]]:
-        """
-        Computes the segmentation for a given penalty using PELT.
+
+    def _seg(self, pen):
+        """Computes the segmentation for a given penalty using PELT (or a list
+        of penalties).
 
         Args:
-            pen (float): penalty value
+            penalty (float): penalty value
 
         Returns:
-        dict: A dictionary containing the breakpoints.  For consistency,
-                we return a dictionary.
+            dict: partition dict {(start, end): cost value,...}
         """
+
         # initialization
-        partitions = dict()
+        # partitions[t] contains the optimal partition of signal[0:t]
+        partitions = dict()  # this dict will be recursively filled
         partitions[0] = {(0, 0): 0}
         admissible = []
 
@@ -90,18 +97,14 @@ class Pelt(BaseEstimator):
                           sum(partitions[bkp].values()) + pen]
 
         best_partition = partitions[self.n_samples]
-        del best_partition[(0, 0)]  # Remove the initial (0,0) "breakpoint"
-        bkps = sorted(e for s, e in best_partition.keys())
+        del best_partition[(0, 0)]
+        return best_partition
 
-        return {'breakpoints': bkps}  # Changed to return a dict
-
-    def fit(self, signal: np.ndarray) -> 'Pelt':
-        """
-        Set params.
+    def fit(self, signal):
+        """Set params.
 
         Args:
-            signal (array): signal to segment.
-                Shape (n_samples, n_features) or (n_samples,).
+            signal (array): signal to segment. Shape (n_samples, n_features) or (n_samples,).
 
         Returns:
             self
@@ -115,12 +118,12 @@ class Pelt(BaseEstimator):
         self.n_samples = n_samples
         return self
 
-    def predict(self, pen: float) -> List[int]:
-        """
-        Return the optimal breakpoints.
 
-        Must be called after the fit method.
-        The breakpoints are associated with the signal passed to fit().
+    def predict(self, pen):
+        """Return the optimal breakpoints.
+
+        Must be called after the fit method. The breakpoints are associated with the signal passed
+        to fit().
 
         Args:
             pen (float): penalty value (>0)
@@ -129,11 +132,12 @@ class Pelt(BaseEstimator):
             list: sorted list of breakpoints
         """
         partition = self._seg(pen)
-        return partition['breakpoints']  # changed to return the breakpoints list
+        bkps = sorted(e for s, e in partition.keys())
+        return bkps
 
-    def fit_predict(self, signal: np.ndarray, pen: float) -> List[int]:
-        """
-        Fit to the signal and return the optimal breakpoints.
+
+    def fit_predict(self, signal, pen):
+        """Fit to the signal and return the optimal breakpoints.
 
         Helper method to call fit and predict once
 
@@ -146,23 +150,6 @@ class Pelt(BaseEstimator):
         """
         self.fit(signal)
         return self.predict(pen)
-
-    def get_features(self, signal: np.ndarray, pen: float) -> Dict[str, List[int]]:
-        """
-        Calculate Pelt features (breakpoints).  This is the key change
-        to make Pelt consistent with other feature extractors.
-
-        Args:
-            signal (np.ndarray): The input time series signal.
-            pen (float): Penalty parameter for PELT.
-
-        Returns:
-            Dict[str, List[int]]: A dictionary with a single key
-            'breakpoints' and the corresponding list of breakpoints.
-        """
-        self.fit(signal)  # Ensure the model is fitted.
-        breakpoints = self.predict(pen)  # Get the breakpoints
-        return {'breakpoints': breakpoints}  # Return in the desired format
 
 
 
@@ -194,7 +181,7 @@ class STLFeatures:
         # STL fits
         if m > 1:
             try:
-                stlfit = STL(x, m, 13).fit()
+                stlfit = STL(x, period=m).fit()
             except:
                 output = {
                     'nperiods': nperiods,
@@ -402,38 +389,160 @@ class CrossingPoints:
 
 class LinearRegression:
     """
-    Performs linear regression on time series data.
+    Performs linear regression of a time series against time using statsmodels OLS,
+    mimicking the attribute structure of scikit-learn's LinearRegression.
 
-    This class calculates the linear regression of a time series against time
-    (i.e., it fits a line to the data) and returns the slope, intercept,
-    and R-squared value.
+    Fits a model y = intercept + coef * t, where t is the time step index.
+
+    Attributes:
+        coef_ (float): The coefficient (slope) of the time variable.
+        intercept_ (float): The intercept of the regression line.
+        results_ (statsmodels.regression.linear_model.RegressionResults):
+            The full results object from statsmodels OLS fit. Contains
+            detailed statistics (R-squared, p-values, standard errors, etc.).
+        n_features_in_ (int): Number of features seen during fit (always 1 for time).
+        _time_steps (np.ndarray): Internal storage of time steps used for fitting.
+        _time_series (np.ndarray): Internal storage of the time series used for fitting.
     """
 
-    def get_features(self, time_series: np.ndarray) -> Dict[str, float]:
+    def __init__(self):
+        """Initializes the TimeLinearRegression model."""
+        self.coef_ = None
+        self.intercept_ = None
+        self.results_ = None
+        self.n_features_in_ = 1 # Regression against time (1 feature)
+        self._time_steps = None
+        self._time_series = None
+
+    def fit(self, time_series: np.ndarray) -> 'TimeLinearRegression':
         """
-        Calculates linear regression features for a time series.
+        Fits the linear regression model to the time series.
 
         Args:
-            time_series (np.ndarray): The input time series data.
+            time_series (np.ndarray): The input time series data (1-dimensional).
 
         Returns:
-            Dict[str, float]: A dictionary containing the slope, intercept,
-                and R-squared value of the regression.
+            self: The fitted TimeLinearRegression instance.
+
+        Raises:
+            ValueError: If the input time_series is not convertible to a 1D numpy array
+                        or has less than 2 data points.
         """
-        # Create the time variable (independent variable)
-        time = np.arange(len(time_series))
-        time_with_constant = add_constant(time)  # Add a constant for the intercept
+        # --- Input validation ---
+        if not isinstance(time_series, np.ndarray):
+            try:
+                time_series = np.array(time_series, dtype=float)
+            except Exception as e:
+                raise ValueError(f"Input time_series could not be converted to a numpy array: {e}")
 
-        # Perform the linear regression
-        model = OLS(time_series, time_with_constant).fit()
+        if time_series.ndim != 1:
+            raise ValueError("Input time_series must be a 1D array.")
+        if len(time_series) < 2:
+            raise ValueError("Input time_series must have at least two data points for linear regression.")
+        # --- End Validation ---
 
-        # Extract the parameters
-        slope = model.params[1]
-        intercept = model.params[0]
-        r_squared = model.rsquared
+        self._time_series = time_series # Store original series
+        self._time_steps = np.arange(len(time_series)) # Create time variable X
 
-        return {
-            "slope": slope,
-            "intercept": intercept,
-            "r_squared": r_squared,
-        }
+        # Add a constant (intercept) term to the independent variable matrix
+        # Reshape time_steps to be a column vector for add_constant if needed,
+        # though add_constant usually handles 1D correctly.
+        time_with_constant = sm.add_constant(self._time_steps)
+
+        # Perform the linear regression using Ordinary Least Squares (OLS)
+        model = sm.OLS(self._time_series, time_with_constant)
+        self.results_: RegressionResults = model.fit() # Store full results
+
+        # Extract intercept and slope (coefficient for time)
+        self.intercept_ = self.results_.params[0]
+        self.coef_ = self.results_.params[1] # Coef for the time variable
+
+        return self # Return the fitted instance
+
+    def predict(self, time_steps: np.ndarray = None) -> np.ndarray:
+        """
+        Predicts time series values for given time steps using the fitted model.
+
+        Args:
+            time_steps (np.ndarray, optional): Array of time steps (indices) to predict for.
+                If None, predicts for the time steps used during fitting. Defaults to None.
+
+        Returns:
+            np.ndarray: The predicted values.
+
+        Raises:
+            RuntimeError: If the model has not been fitted yet.
+            ValueError: If time_steps is not a 1D array or convertible to one.
+        """
+        if self.results_ is None:
+            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+
+        if time_steps is None:
+            # Predict on the original time steps used for fitting
+            time_input = self._time_steps
+        else:
+             # --- Input validation ---
+            if not isinstance(time_steps, np.ndarray):
+                try:
+                    time_steps = np.array(time_steps, dtype=float)
+                except Exception as e:
+                    raise ValueError(f"Input time_steps could not be converted to a numpy array: {e}")
+            if time_steps.ndim != 1:
+                raise ValueError("Input time_steps must be a 1D array.")
+            time_input = time_steps
+             # --- End Validation ---
+
+
+        # Add constant for prediction
+        time_input_with_constant = sm.add_constant(time_input)
+        return self.results_.predict(time_input_with_constant)
+
+    def score(self) -> float:
+        """
+        Returns the R-squared ($R^2$) coefficient of determination for the fit
+        on the training data.
+
+        Returns:
+            float: The R-squared value.
+
+        Raises:
+            RuntimeError: If the model has not been fitted yet.
+        """
+        if self.results_ is None:
+            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+
+        # R-squared is directly available from statsmodels results
+        return self.results_.rsquared
+
+    def plot_fit(self, figsize=(10, 6)):
+        """
+        Generates a plot showing the original data and the fitted line.
+
+        Args:
+            figsize (tuple, optional): Figure size for the plot. Defaults to (10, 6).
+
+        Raises:
+            RuntimeError: If the model has not been fitted yet.
+        """
+        if self.results_ is None:
+            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+
+        predicted_values = self.predict() # Predict on original time steps
+
+        plt.figure(figsize=figsize)
+        plt.scatter(self._time_steps, self._time_series, label='Original Data Points', marker='o', s=20, alpha=0.7)
+        plt.plot(self._time_steps, predicted_values, color='red', linewidth=2, label=f'Fitted Line (Slope={self.coef_:.4f})')
+
+        plt.xlabel("Time Step")
+        plt.ylabel("Time Series Value")
+        plt.title("Linear Regression of Time Series vs. Time")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def summary(self):
+        """Prints the detailed summary from statsmodels OLS results."""
+        if self.results_ is None:
+            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+        print(self.results_.summary())
