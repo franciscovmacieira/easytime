@@ -1,541 +1,553 @@
-from statsmodels.tsa.seasonal import STL
-from statsmodels.nonparametric import _smoothers_lowess
-from statsmodels.regression.linear_model import OLS
-from statsmodels.tools.tools import add_constant
-import statsmodels.api as sm
-from typing import Dict, List
-from math import floor
-from ruptures.base import BaseEstimator
-from ruptures.costs import cost_factory
+# --- Necessary Imports ---
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd # Used indirectly if Y_df is processed before calling these
+import statsmodels.api as sm
+from statsmodels.tsa.seasonal import STL
+from statsmodels.tsa.stattools import acf # Moved import here for clarity
+from statsmodels.nonparametric._smoothers_lowess import lowess # Explicit import for clarity
+from statsmodels.regression.linear_model import OLS, RegressionResults # Added RegressionResults for typing hint
+from statsmodels.tools.tools import add_constant
+from typing import Dict, List, Optional # Added Optional
 from math import floor
+import matplotlib.pyplot as plt # Kept for plot_fit method
 
-from ruptures.costs import cost_factory
-from ruptures.base import BaseCost, BaseEstimator
+# Imports for Pelt (assuming ruptures is installed)
+try:
+    from ruptures.base import BaseEstimator, BaseCost
+    from ruptures.costs import cost_factory
+except ImportError:
+    print("Warning: 'ruptures' library not found. Pelt class will not be fully functional.")
+    # Define dummy base classes if ruptures is not installed to avoid NameErrors
+    # This allows the script to load but Pelt won't work.
+    class BaseEstimator: pass
+    class BaseCost: pass
+    def cost_factory(**kwargs): raise NotImplementedError("ruptures not installed")
 
+# --- Modified Custom Classes ---
 
 class Pelt(BaseEstimator):
-
-    """Penalized change point detection.
-
-    For a given model and penalty level, computes the segmentation which minimizes the constrained
-    sum of approximation errors.
-
     """
+    Penalized change point detection using the PELT algorithm.
 
-    def __init__(self, model="l2", custom_cost=None, min_size=2, jump=5, params=None):
+    This implementation closely follows ruptures.detection.Pelt. Finds change points
+    by minimizing a penalized sum of segment costs.
+    """
+    def __init__(self, model: str = "l2", custom_cost: Optional[BaseCost] = None,
+                 min_size: int = 2, jump: int = 5, params: Optional[Dict] = None):
         """Initialize a Pelt instance.
 
         Args:
-            model (str, optional): segment model, ["l1", "l2", "rbf"]. Not used if ``'custom_cost'`` is not None.
-            custom_cost (BaseCost, optional): custom cost function. Defaults to None.
-            min_size (int, optional): minimum segment length.
-            jump (int, optional): subsample (one every *jump* points).
-            params (dict, optional): a dictionary of parameters for the cost instance.
-
-        Returns:
-            self
+            model (str, optional): Segment cost model ("l1", "l2", "rbf", etc.)
+                 used if custom_cost is None. Defaults to "l2".
+            custom_cost (BaseCost, optional): Custom cost function instance.
+                 Overrides `model`. Defaults to None.
+            min_size (int, optional): Minimum segment length. Defaults to 2.
+            jump (int, optional): Subsample rate for checking breakpoints
+                 (one every 'jump' points). Defaults to 5.
+            params (dict, optional): Dictionary of parameters for the cost
+                 instance if using a standard `model`. Defaults to None.
         """
         if custom_cost is not None and isinstance(custom_cost, BaseCost):
             self.cost = custom_cost
         else:
-            if params is None:
-                self.cost = cost_factory(model=model)
-            else:
-                self.cost = cost_factory(model=model, **params)
-        self.min_size = max(min_size, self.cost.min_size)
+            cost_params = params if params is not None else {}
+            self.cost = cost_factory(model=model, **cost_params)
+
+        # Ensure min_size respects the cost function's minimum
+        self.min_size = max(min_size, getattr(self.cost, 'min_size', 1)) # Use getattr for safety
         self.jump = jump
         self.n_samples = None
+        # Note: self.signal is set in fit() by the BaseCost object
 
-
-    def _seg(self, pen):
-        """Computes the segmentation for a given penalty using PELT (or a list
-        of penalties).
-
-        Args:
-            penalty (float): penalty value
-
-        Returns:
-            dict: partition dict {(start, end): cost value,...}
-        """
-
-        # initialization
-        # partitions[t] contains the optimal partition of signal[0:t]
-        partitions = dict()  # this dict will be recursively filled
-        partitions[0] = {(0, 0): 0}
+    def _seg(self, pen: float) -> Dict[tuple, float]:
+        """Computes the segmentation for a given penalty using PELT."""
+        partitions = {0: {(0, 0): 0}}
         admissible = []
+        ind = list(range(0, self.n_samples, self.jump))
+        # Ensure last index and indices >= min_size are included correctly
+        if self.n_samples > 0:
+             min_idx_start = (self.min_size // self.jump) * self.jump
+             ind = [k for k in ind if k >= min_idx_start]
+             if self.n_samples not in ind:
+                ind.append(self.n_samples)
 
-        # Recursion
-        ind = [
-            k for k in range(0, self.n_samples, self.jump) if k >= self.min_size]
-        ind += [self.n_samples]
         for bkp in ind:
-            # adding a point to the admissible set from the previous loop.
-            new_adm_pt = floor((bkp - self.min_size) / self.jump)
-            new_adm_pt *= self.jump
+            # Add potential previous change point to check
+            new_adm_pt = max(0, floor((bkp - self.min_size) / self.jump) * self.jump)
             admissible.append(new_adm_pt)
 
-            subproblems = list()
+            subproblems = []
+            min_cost = float('inf')
+
             for t in admissible:
-                # left partition
+                if t >= bkp: continue # Ensure start is before end
+                # Ensure segment t..bkp is long enough
+                if bkp - t < self.min_size: continue
+
                 try:
-                    tmp_partition = partitions[t].copy()
-                except KeyError:  # no partition of 0:t exists
+                    cost_t = sum(partitions[t].values())
+                    current_segment_cost = self.cost.error(t, bkp)
+                    subproblem_cost = cost_t + current_segment_cost + pen
+                    subproblems.append((subproblem_cost, t))
+                    min_cost = min(min_cost, subproblem_cost)
+                except KeyError: # Partition for t doesn't exist
                     continue
-                # we update with the right partition
-                tmp_partition.update({(t, bkp): self.cost.error(t, bkp) + pen})
-                subproblems.append(tmp_partition)
+                except Exception as e: # Catch cost calculation errors
+                    # print(f"Warning: Cost calculation error for segment ({t}, {bkp}): {e}")
+                    continue
 
-            # finding the optimal partition
-            partitions[bkp] = min(
-                subproblems, key=lambda d: sum(d.values()))
-            # trimming the admissible set
-            admissible = [t for t, partition in
-                          zip(admissible, subproblems) if
-                          sum(partition.values()) <=
-                          sum(partitions[bkp].values()) + pen]
 
-        best_partition = partitions[self.n_samples]
-        del best_partition[(0, 0)]
+            if not subproblems: # Handle cases where no valid subproblems found
+                 if bkp == 0: continue # Skip if it's the start
+                 # Assign infinite cost if no valid prior partition leads here
+                 # This shouldn't happen if partitions[0] is set right
+                 partitions[bkp] = {(0, bkp): float('inf')}
+                 # print(f"Warning: No valid subproblem found for breakpoint {bkp}")
+                 continue
+
+
+            # Find the optimal previous breakpoint t_star
+            # Using min_cost calculated during subproblem creation
+            best_t = min(subproblems, key=lambda sp: sp[0])[1]
+
+            # Build the optimal partition up to bkp
+            partitions[bkp] = partitions[best_t].copy()
+            partitions[bkp][(best_t, bkp)] = self.cost.error(best_t, bkp) + pen
+
+
+            # Pruning step (Rizzo adaptation check)
+            admissible = [t for t in admissible if sum(partitions[t].values()) + self.cost.error(t, bkp) <= min_cost + pen]
+
+
+        best_partition = partitions.get(self.n_samples,{}) # Use .get for safety
+        # Remove the initial dummy partition if it exists
+        best_partition.pop((0, 0), None)
         return best_partition
 
-    def fit(self, signal):
-        """Set params.
+
+    def fit(self, signal: np.ndarray) -> 'Pelt':
+        """Fit the cost function to the signal and store signal properties.
 
         Args:
-            signal (array): signal to segment. Shape (n_samples, n_features) or (n_samples,).
+            signal (array): Signal to segment. Shape (n_samples, n_features) or (n_samples,).
 
         Returns:
             self
         """
-        # update params
-        self.cost.fit(signal)
         if signal.ndim == 1:
             n_samples, = signal.shape
         else:
             n_samples, _ = signal.shape
         self.n_samples = n_samples
+        self.cost.fit(signal) # Fit the cost function
         return self
 
+    def predict(self, pen: float) -> List[int]:
+        """Return the optimal breakpoints for a given penalty.
 
-    def predict(self, pen):
-        """Return the optimal breakpoints.
-
-        Must be called after the fit method. The breakpoints are associated with the signal passed
-        to fit().
+        Must be called after fit().
 
         Args:
-            pen (float): penalty value (>0)
+            pen (float): Penalty value (>0).
 
         Returns:
-            list: sorted list of breakpoints
+            list: Sorted list of breakpoint indices (end points of segments).
         """
-        partition = self._seg(pen)
+        if self.n_samples is None:
+             raise ValueError("fit() must be called before predict()")
+        partition = self._seg(pen=pen)
         bkps = sorted(e for s, e in partition.keys())
-        return bkps
+        # Add 0 if it's not implicitly the start of the first segment found
+        # if 0 not in {s for s, e in partition.keys()} and bkps:
+        #    bkps.insert(0, 0) # Usually PELT returns end points, 0 isn't needed unless no segments found
+        # Ensure n_samples is the last breakpoint if signal has length > 0
+        if self.n_samples > 0 and (not bkps or bkps[-1] != self.n_samples) :
+            #This can happen if the optimal partition is just (0, n_samples)
+             if not any(e == self.n_samples for s,e in partition.keys()):
+                 #If the only segment is (0, n_samples), keys are just {(0, n_samples): cost}, so bkps is [n_samples]
+                 # If partition is empty (error?), ensure n_samples is there
+                 if self.n_samples not in bkps:
+                    bkps.append(self.n_samples)
 
 
-    def fit_predict(self, signal, pen):
-        """Fit to the signal and return the optimal breakpoints.
+        # Return unique sorted list including the end point n_samples
+        # The output should be the END indices of the segments.
+        # Example: signal[0..10], segments (0,3), (3,7), (7,10) -> bkps=[3, 7, 10]
+        final_bkps = sorted(list(set(bkps)))
+        # Ensure the final breakpoint is the length of the series, unless empty
+        if self.n_samples > 0 and (not final_bkps or final_bkps[-1] != self.n_samples):
+             final_bkps.append(self.n_samples)
+             final_bkps=sorted(list(set(final_bkps)))
 
-        Helper method to call fit and predict once
+        # Remove 0 if it crept in, PELT typically returns end points > 0
+        if 0 in final_bkps:
+            final_bkps.remove(0)
 
-        Args:
-            signal (array): signal. Shape (n_samples, n_features) or (n_samples,).
-            pen (float): penalty value (>0)
+        return final_bkps
 
-        Returns:
-            list: sorted list of breakpoints
-        """
+
+    def fit_predict(self, signal: np.ndarray, pen: float) -> List[int]:
+        """Fit to the signal and return the optimal breakpoints."""
         self.fit(signal)
         return self.predict(pen)
 
 
-
 class STLFeatures:
     """
-    Calculates seasonal trend using loess decomposition.
+    Calculates time series features based on STL decomposition.
+
+    Uses statsmodels.tsa.seasonal.STL for decomposition and calculates
+    features like trend/seasonal strength, linearity, curvature etc.
     """
-    def __init__(self, freq: int = 1):
-        """
-        Initialize the STLFeatures class.
+    def __init__(self, freq: int = 1,
+                 seasonal: int = 7,
+                 robust: bool = False):
+        """Initialize STLFeatures.
 
         Args:
-            freq (int, optional): Frequency of the time series. Defaults to 1.
+            freq (int, optional): Frequency of the time series (e.g., 12 for
+                monthly data). Mapped to 'period' in statsmodels STL. Defaults to 1.
+            seasonal (int, optional): Length of the seasonal smoother. Must be odd.
+                Defaults to 7. Passed to statsmodels STL.
+            robust (bool, optional): Flag indicating whether to use robust weights
+                for the STL decomposition. Defaults to False. Passed to statsmodels STL.
         """
+        if freq <= 0:
+             raise ValueError("freq (period) must be positive.")
+        if seasonal <= 0 or seasonal % 2 == 0:
+            raise ValueError("seasonal smoother length must be positive and odd.")
+
         self.freq = freq
+        self.seasonal = seasonal
+        self.robust = robust
 
     def get_features(self, x: np.ndarray) -> Dict[str, float]:
-        """
-        Calculates STL features.
+        """Calculates STL features for a time series.
 
         Args:
-            x (numpy array): The time series.
+            x (numpy array): The time series array (1-dimensional).
 
         Returns:
-        dict: A dictionary containing the STL features.
+            dict: A dictionary containing calculated STL features.
+                  Returns NaNs for features if decomposition fails or series is too short.
         """
         m = self.freq
-        nperiods = int(m > 1)
-        # STL fits
-        if m > 1:
-            try:
-                stlfit = STL(x, period=m).fit()
-            except:
-                output = {
-                    'nperiods': nperiods,
-                    'seasonal_period': m,
-                    'trend': np.nan,
-                    'spike': np.nan,
-                    'linearity': np.nan,
-                    'curvature': np.nan,
-                    'e_acf1': np.nan,
-                    'e_acf10': np.nan,
-                    'seasonal_strength': np.nan,
-                    'peak': np.nan,
-                    'trough': np.nan
-                }
-
-                return output
-
-            trend0 = stlfit.trend
-            remainder = stlfit.resid
-            seasonal = stlfit.seasonal
-        else:
-            deseas = x
-            t = np.arange(len(x)) + 1
-            try:
-                trend0 = _smoothers_lowess().fit(t, deseas).predict(t)
-            except:
-                output = {
-                    'nperiods': nperiods,
-                    'seasonal_period': m,
-                    'trend': np.nan,
-                    'spike': np.nan,
-                    'linearity': np.nan,
-                    'curvature': np.nan,
-                    'e_acf1': np.nan,
-                    'e_acf10': np.nan
-                }
-
-                return output
-
-            remainder = deseas - trend0
-            seasonal = np.zeros(len(x))
-        # De-trended and de-seasonalized data
-        detrend = x - trend0
-        deseason = x - seasonal
-        fits = x - remainder
-        # Summay stats
         n = len(x)
+
+        # Basic conditions check
+        min_len = 2 * m + 1 if m > 1 else 2 # STL needs at least 2 periods
+        if n < min_len:
+             print(f"Warning: Series too short (len {n} < {min_len}) for STL with period {m}. Returning NaNs.")
+             # Return dict with NaNs, structure depends on whether m > 1
+             output = {'nperiods': int(m>1), 'seasonal_period': m, 'trend': np.nan, 'spike': np.nan, 'linearity': np.nan, 'curvature': np.nan, 'e_acf1': np.nan, 'e_acf10': np.nan}
+             if m > 1: output.update({'seasonal_strength': np.nan, 'peak': np.nan, 'trough': np.nan})
+             return output
+
+        trend0 = np.full(n, np.nan)
+        seasonal = np.full(n, np.nan)
+        remainder = np.full(n, np.nan)
+
+        try:
+            if m > 1:
+                stlfit = STL(x, period=m, seasonal=self.seasonal, robust=self.robust).fit()
+                trend0 = stlfit.trend
+                remainder = stlfit.resid
+                seasonal = stlfit.seasonal
+            else: # Use lowess for trend if non-seasonal
+                # lowess requires float type
+                trend0 = lowess(x, np.arange(n), frac=0.6, it=2)[:, 1] # Example params, might need tuning
+                remainder = x - trend0
+                seasonal = np.zeros(n) # No seasonality
+
+        except Exception as e:
+            print(f"Warning: STL decomposition failed: {e}. Returning NaNs.")
+            # Return dict with NaNs
+            output = {'nperiods': int(m>1), 'seasonal_period': m, 'trend': np.nan, 'spike': np.nan, 'linearity': np.nan, 'curvature': np.nan, 'e_acf1': np.nan, 'e_acf10': np.nan}
+            if m > 1: output.update({'seasonal_strength': np.nan, 'peak': np.nan, 'trough': np.nan})
+            return output
+
+        # Proceed with feature calculation only if decomposition was successful
         varx = np.nanvar(x, ddof=1)
+        vardeseason = np.nanvar(x - seasonal, ddof=1)
         vare = np.nanvar(remainder, ddof=1)
-        vardetrend = np.nanvar(detrend, ddof=1)
-        vardeseason = np.nanvar(deseason, ddof=1)
-        # Measure of trend strength
-        if varx < np.finfo(float).eps:
-            trend = 0
-        elif (vardeseason / varx < 1e-10):
-            trend = 0
-        else:
-            trend = max(0, min(1, 1 - vare / vardeseason))
-        # Measure of seasonal strength
+
+        # Trend Strength
+        trend_strength = np.nan
+        if not np.isclose(varx, 0) and not np.isclose(vardeseason, 0):
+            trend_strength = max(0., min(1., 1. - (vare / vardeseason)))
+
+        # Seasonal Strength (only if m > 1)
+        seasonal_strength = np.nan
+        peak = np.nan
+        trough = np.nan
         if m > 1:
-            if varx < np.finfo(float).eps:
-                season = 0
-            elif np.nanvar(remainder + seasonal, ddof=1) < np.finfo(float).eps:
-                season = 0
-            else:
-                season = max(0, min(1, 1 - vare / np.nanvar(remainder + seasonal, ddof=1)))
+            var_seas_rem = np.nanvar(seasonal + remainder, ddof=1)
+            if not np.isclose(varx, 0) and not np.isclose(var_seas_rem, 0):
+                seasonal_strength = max(0., min(1., 1. - (vare / var_seas_rem)))
 
-            peak = (np.argmax(seasonal) + 1) % m
-            peak = m if peak == 0 else peak
+            # Peak/Trough calculation needs valid seasonal component
+            if not np.all(np.isnan(seasonal)):
+                peak_idx = np.nanargmax(seasonal)
+                trough_idx = np.nanargmin(seasonal)
+                # Ensure indices are valid before modulo
+                if not np.isnan(peak_idx): peak = (peak_idx % m) + 1
+                if not np.isnan(trough_idx): trough = (trough_idx % m) + 1
 
-            trough = (np.argmin(seasonal) + 1) % m
-            trough = m if trough == 0 else trough
-        # Compute measure of spikiness
+
+        # Spikiness
         d = (remainder - np.nanmean(remainder)) ** 2
-        varloo = (vare * (n - 1) - d) / (n - 2)
-        spike = np.nanvar(varloo, ddof=1)
-        # Compute measures of linearity and curvature
-        time = np.arange(n) + 1
-        poly_m = poly(time, 2)
-        time_x = add_constant(poly_m)
-        coefs = OLS(trend0, time_x).fit().params
+        varloo = (vare * (n - 1) - d) / (n - 2) if n > 2 else np.full(n, np.nan)
+        spike = np.nanvar(varloo, ddof=1) if n > 2 else np.nan
 
-        try:
-            linearity = coefs[1]
-        except:
-            linearity = np.nan
-        try:
-            curvature = -coefs[2]
-        except:
-            curvature = np.nan
-        # ACF features
-        acf_obj = ACF_Features(freq=m) #instantiate the ACF_Features class
-        acfremainder = acf_obj.get_features(remainder)
+        # Linearity & Curvature (from trend component)
+        linearity = np.nan
+        curvature = np.nan
+        if not np.all(np.isnan(trend0)) and n >= 3: # Need at least 3 points for quadratic fit
+             time = np.arange(n)
+             try:
+                 # Using poly directly instead of separate function
+                 X = np.vstack([time**p for p in range(3)]).T # constant, t, t^2
+                 # Ensure X is float
+                 X = X.astype(float)
+                 # OLS requires float endog too
+                 trend0_float = trend0.astype(float)
+
+                 ols_model = OLS(trend0_float, X, missing='drop') # Handle potential NaNs in trend0
+                 ols_results = ols_model.fit()
+                 coefs = ols_results.params
+                 if len(coefs) >= 2: linearity = coefs[1] # Coeff for time
+                 if len(coefs) >= 3: curvature = -coefs[2] # Coeff for time^2 (- sign seems conventional here)
+             except Exception as e:
+                  print(f"Warning: OLS fit for linearity/curvature failed: {e}")
+
+
+        # ACF features of the remainder
+        e_acf1 = np.nan
+        e_acf10 = np.nan
+        if not np.all(np.isnan(remainder)):
+            # Using default nlags=10 here, could make ACF_Features configurable too
+            acf_calculator = ACF_Features(nlags=10) # Instantiate with desired nlags
+            try:
+                acf_result = acf_calculator.get_features(remainder)
+                e_acf1 = acf_result.get('x_acf1', np.nan)
+                e_acf10 = acf_result.get('x_acf10', np.nan)
+            except Exception as e:
+                 print(f"Warning: ACF calculation on remainder failed: {e}")
+
         # Assemble features
         output = {
-            'nperiods': nperiods,
+            'nperiods': int(m > 1),
             'seasonal_period': m,
-            'trend': trend,
+            'trend': trend_strength,
             'spike': spike,
             'linearity': linearity,
             'curvature': curvature,
-            'e_acf1': acfremainder['x_acf1'],
-            'e_acf10': acfremainder['x_acf10']
+            'e_acf1': e_acf1,
+            'e_acf10': e_acf10
         }
-
         if m > 1:
-            output['seasonal_strength'] = season
+            output['seasonal_strength'] = seasonal_strength
             output['peak'] = peak
             output['trough'] = trough
 
         return output
 
-def poly(t: np.ndarray, degree: int) -> np.ndarray:
-    """Computes a polynomial of a given degree.
-
-    Parameters
-    ----------
-    t: numpy array
-        The time series.
-    degree: int
-        Degree of the polynomial
-
-    Returns
-    -------
-    numpy array
-        Polynomial of given degree
-    """
-    n = len(t)
-    T = np.zeros((n, degree + 1))
-    for i in range(degree + 1):
-        T[:, i] = t ** i
-    return T
-
-
 
 class ACF_Features:
     """
-    Calculates the autocorrelation coefficients
+    Calculates autocorrelation features using statsmodels.tsa.stattools.acf.
     """
-    def __init__(self, freq: int = 1):
-        """
-        Initialize the ACF_Features class.
+    def __init__(self, nlags: int = 10):
+        """Initialize ACF_Features.
 
         Args:
-            freq (int, optional): Frequency of the time series. Defaults to 1.
+            nlags (int, optional): The number of lags to include in the ACF calculation.
+                                   Defaults to 10. Passed to statsmodels.acf.
         """
-        self.freq = freq
+        if nlags <= 0:
+            raise ValueError("nlags must be positive.")
+        self.nlags = nlags
 
     def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """Calculates autocorrelation coefficients.
+
+        Args:
+            x (numpy array): The time series array (1-dimensional).
+
+        Returns:
+            dict: Contains 'x_acf1' (ACF at lag 1) and 'x_acf10'
+                  (sum of ACF at lags 1 to min(nlags, 10)). Returns NaNs on error.
         """
-        Calculates the autocorrelation coefficients
+        if len(x) <= max(1, self.nlags): # Need enough points to calculate lags
+             print(f"Warning: Series too short (len {len(x)}) for nlags={self.nlags}. Returning NaNs.")
+             return {'x_acf1': np.nan, 'x_acf10': np.nan}
 
-        Parameters
-        ----------
-        x: numpy array
-            The time series.
+        try:
+            # Ensure nlags passed to acf is not more than length-1
+            effective_nlags = min(self.nlags, len(x) - 1)
+            if effective_nlags <= 0: # Should not happen if len(x)>1, but check
+                raise ValueError("Effective nlags <= 0")
 
-        Returns
-        -------
-        dict
-            'x_acf1': First autocorrelation coefficient
-            'x_acf10': Sum of the first 10 autocorrelation coefficients
-        """
-        from statsmodels.tsa.stattools import acf
-        acf_values = acf(x, nlags=10)
-        acf1 = acf_values[1]
-        acf10 = acf_values[1:11].sum()
-        return {'x_acf1': acf1, 'x_acf10': acf10}
+            acf_values = acf(x, nlags=effective_nlags, fft=True, missing='drop') # Use fft=True, handle NaNs
 
+            # acf_values includes lag 0, which is always 1
+            acf1 = acf_values[1] if len(acf_values) > 1 else np.nan
+
+            # Sum lags 1 to min(effective_nlags, 10)
+            # Ensure we don't go beyond calculated lags or lag 10
+            max_lag_for_sum = min(effective_nlags, 10)
+            acf10 = np.sum(acf_values[1 : max_lag_for_sum + 1]) if max_lag_for_sum > 0 else np.nan
+
+            return {'x_acf1': acf1, 'x_acf10': acf10}
+        except Exception as e:
+            print(f"Warning: ACF calculation failed: {e}. Returning NaNs.")
+            return {'x_acf1': np.nan, 'x_acf10': np.nan}
 
 
 class CrossingPoints:
     """
     Calculates the number of times a time series crosses its median.
     """
-    def __init__(self, freq: int = 1):
-        """
-        Initialize the CrossingPoints class.
+    def __init__(self):
+        """Initialize CrossingPoints. Takes no parameters."""
+        pass # No parameters needed for this calculation
+
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """Calculates the number of median crossing points.
 
         Args:
-            freq (int, optional): Frequency of the time series. Defaults to 1.
+            x (numpy array): The time series array (1-dimensional).
+
+        Returns:
+            dict: Contains 'crossing_points'. Returns NaN if calculation fails.
         """
-        self.freq = freq
-    def get_features(self, x: np.ndarray) -> Dict[str, float]:
-        """Crossing points.
+        try:
+             if len(x) < 2: return {'crossing_points': 0.} # Cannot cross with < 2 points
 
-        Parameters
-        ----------
-        x: numpy array
-            The time series.
+             midline = np.nanmedian(x) # Use nanmedian for robustness
+             if np.isnan(midline): return {'crossing_points': np.nan} # Cannot calculate if median is NaN
 
-        Returns
-        -------
-        dict
-            'crossing_points': Number of times that x crosses the median.
-        """
-        midline = np.median(x)
-        ab = x <= midline
-        lenx = len(x)
-        p1 = ab[:(lenx - 1)]
-        p2 = ab[1:]
-        cross = (p1 & (~p2)) | (p2 & (~p1))
+             # Ensure boolean comparison handles NaNs (they become False)
+             ab = x <= midline
+             # Handle potential all-NaNs case if not caught by nanmedian
+             if np.all(np.isnan(ab)): return {'crossing_points': np.nan}
 
-        return {'crossing_points': cross.sum()}
+
+             # Detect where the condition changes
+             p1 = ab[:-1]
+             p2 = ab[1:]
+             # A cross happens if (True->False) or (False->True) excluding NaNs
+             # NaNs in x will propagate to ab, potentially affecting cross calculation
+             # We only count transitions between non-NaN adjacent states
+             valid_comparison = ~np.isnan(p1) & ~np.isnan(p2)
+             cross = ((p1 & ~p2) | (~p1 & p2)) & valid_comparison
+
+             return {'crossing_points': float(np.sum(cross))}
+        except Exception as e:
+             print(f"Warning: CrossingPoints calculation failed: {e}. Returning NaN.")
+             return {'crossing_points': np.nan}
+
 
 class LinearRegression:
     """
-    Performs linear regression of a time series against time using statsmodels OLS,
-    mimicking the attribute structure of scikit-learn's LinearRegression.
+    Performs linear regression of a time series against time (y = B0 + B1*t).
 
-    Fits a model y = intercept + coef * t, where t is the time step index.
-
-    Attributes:
-        coef_ (float): The coefficient (slope) of the time variable.
-        intercept_ (float): The intercept of the regression line.
-        results_ (statsmodels.regression.linear_model.RegressionResults):
-            The full results object from statsmodels OLS fit. Contains
-            detailed statistics (R-squared, p-values, standard errors, etc.).
-        n_features_in_ (int): Number of features seen during fit (always 1 for time).
-        _time_steps (np.ndarray): Internal storage of time steps used for fitting.
-        _time_series (np.ndarray): Internal storage of the time series used for fitting.
+    Uses statsmodels.regression.linear_model.OLS internally.
     """
-
     def __init__(self):
-        """Initializes the TimeLinearRegression model."""
-        self.coef_ = None
-        self.intercept_ = None
-        self.results_ = None
-        self.n_features_in_ = 1 # Regression against time (1 feature)
-        self._time_steps = None
-        self._time_series = None
+        """Initializes the LinearRegression model. Takes no parameters."""
+        self.coef_: Optional[float] = None # Slope (B1)
+        self.intercept_: Optional[float] = None # Intercept (B0)
+        self.results_: Optional[RegressionResults] = None # Full OLS results
+        self.n_features_in_: int = 1 # Always 1 (time)
+        self._time_steps: Optional[np.ndarray] = None
+        self._time_series: Optional[np.ndarray] = None
 
-    def fit(self, time_series: np.ndarray) -> 'TimeLinearRegression':
-        """
-        Fits the linear regression model to the time series.
+    def fit(self, time_series: np.ndarray) -> 'LinearRegression':
+        """Fits the linear regression model y ~ time.
 
         Args:
-            time_series (np.ndarray): The input time series data (1-dimensional).
+            time_series (np.ndarray): 1-dimensional time series data.
 
         Returns:
-            self: The fitted TimeLinearRegression instance.
-
-        Raises:
-            ValueError: If the input time_series is not convertible to a 1D numpy array
-                        or has less than 2 data points.
+            self: The fitted instance.
         """
-        # --- Input validation ---
-        if not isinstance(time_series, np.ndarray):
-            try:
-                time_series = np.array(time_series, dtype=float)
-            except Exception as e:
-                raise ValueError(f"Input time_series could not be converted to a numpy array: {e}")
+        # Input validation (simplified)
+        y = np.asarray(time_series, dtype=float)
+        if y.ndim != 1: raise ValueError("Input time_series must be 1D.")
+        if len(y) < 2: raise ValueError("Need at least two points for linear regression.")
 
-        if time_series.ndim != 1:
-            raise ValueError("Input time_series must be a 1D array.")
-        if len(time_series) < 2:
-            raise ValueError("Input time_series must have at least two data points for linear regression.")
-        # --- End Validation ---
+        self._time_series = y
+        self._time_steps = np.arange(len(y), dtype=float) # Ensure float for OLS
 
-        self._time_series = time_series # Store original series
-        self._time_steps = np.arange(len(time_series)) # Create time variable X
+        # Create exogenous variable matrix [constant, time]
+        X = sm.add_constant(self._time_steps)
 
-        # Add a constant (intercept) term to the independent variable matrix
-        # Reshape time_steps to be a column vector for add_constant if needed,
-        # though add_constant usually handles 1D correctly.
-        time_with_constant = sm.add_constant(self._time_steps)
+        # Handle potential NaNs in the time series
+        valid_idx = ~np.isnan(y) & ~np.isnan(np.sum(X, axis=1)) # Check NaNs in both y and X
+        if np.sum(valid_idx) < 2:
+             raise ValueError("Not enough non-NaN data points (need at least 2).")
 
-        # Perform the linear regression using Ordinary Least Squares (OLS)
-        model = sm.OLS(self._time_series, time_with_constant)
-        self.results_: RegressionResults = model.fit() # Store full results
+        y_fit = y[valid_idx]
+        X_fit = X[valid_idx, :]
 
-        # Extract intercept and slope (coefficient for time)
+
+        # Perform OLS
+        model = sm.OLS(y_fit, X_fit) # Use data without NaNs
+        self.results_ = model.fit()
+
+        # Store coefficients
         self.intercept_ = self.results_.params[0]
-        self.coef_ = self.results_.params[1] # Coef for the time variable
+        self.coef_ = self.results_.params[1]
 
-        return self # Return the fitted instance
+        return self
 
-    def predict(self, time_steps: np.ndarray = None) -> np.ndarray:
-        """
-        Predicts time series values for given time steps using the fitted model.
+    def predict(self, time_steps: Optional[np.ndarray] = None) -> np.ndarray:
+        """Predicts values using the fitted linear model.
 
         Args:
-            time_steps (np.ndarray, optional): Array of time steps (indices) to predict for.
-                If None, predicts for the time steps used during fitting. Defaults to None.
+            time_steps (np.ndarray, optional): Time indices to predict for.
+                If None, predicts for the original time steps used in fit().
 
         Returns:
-            np.ndarray: The predicted values.
-
-        Raises:
-            RuntimeError: If the model has not been fitted yet.
-            ValueError: If time_steps is not a 1D array or convertible to one.
+            np.ndarray: Predicted values.
         """
         if self.results_ is None:
             raise RuntimeError("Model has not been fitted yet. Call fit() first.")
 
         if time_steps is None:
-            # Predict on the original time steps used for fitting
-            time_input = self._time_steps
+            X_pred = sm.add_constant(self._time_steps)
         else:
-             # --- Input validation ---
-            if not isinstance(time_steps, np.ndarray):
-                try:
-                    time_steps = np.array(time_steps, dtype=float)
-                except Exception as e:
-                    raise ValueError(f"Input time_steps could not be converted to a numpy array: {e}")
-            if time_steps.ndim != 1:
-                raise ValueError("Input time_steps must be a 1D array.")
-            time_input = time_steps
-             # --- End Validation ---
+            t_pred = np.asarray(time_steps, dtype=float)
+            if t_pred.ndim != 1: raise ValueError("time_steps must be 1D.")
+            X_pred = sm.add_constant(t_pred)
 
+        return self.results_.predict(X_pred)
 
-        # Add constant for prediction
-        time_input_with_constant = sm.add_constant(time_input)
-        return self.results_.predict(time_input_with_constant)
-
-    def score(self) -> float:
-        """
-        Returns the R-squared ($R^2$) coefficient of determination for the fit
-        on the training data.
+    def score(self) -> Optional[float]:
+        """Returns the R-squared ($R^2$) of the fit on the training data.
 
         Returns:
-            float: The R-squared value.
-
-        Raises:
-            RuntimeError: If the model has not been fitted yet.
+            float or None: R-squared value, or None if not fitted.
         """
         if self.results_ is None:
-            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
-
-        # R-squared is directly available from statsmodels results
+            # raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+            return None # Return None instead of raising error if not fitted
         return self.results_.rsquared
 
     def plot_fit(self, figsize=(10, 6)):
-        """
-        Generates a plot showing the original data and the fitted line.
-
-        Args:
-            figsize (tuple, optional): Figure size for the plot. Defaults to (10, 6).
-
-        Raises:
-            RuntimeError: If the model has not been fitted yet.
-        """
-        if self.results_ is None:
-            raise RuntimeError("Model has not been fitted yet. Call fit() first.")
+        """Generates a plot showing the original data and the fitted line."""
+        if self.results_ is None or self._time_series is None or self._time_steps is None:
+            raise RuntimeError("Model has not been fitted or data is missing.")
 
         predicted_values = self.predict() # Predict on original time steps
 
         plt.figure(figsize=figsize)
         plt.scatter(self._time_steps, self._time_series, label='Original Data Points', marker='o', s=20, alpha=0.7)
         plt.plot(self._time_steps, predicted_values, color='red', linewidth=2, label=f'Fitted Line (Slope={self.coef_:.4f})')
-
         plt.xlabel("Time Step")
         plt.ylabel("Time Series Value")
-        plt.title("Linear Regression of Time Series vs. Time")
+        plt.title(f"Linear Regression Fit ($R^2$={self.score():.3f})")
         plt.legend()
         plt.grid(True)
         plt.tight_layout()

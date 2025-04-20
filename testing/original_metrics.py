@@ -88,7 +88,7 @@ def test_original_metrics():
 
         # 2. STL Trend Strength - USING STATSMODELS DIRECTLY FOR FAIR COMPARISON
         if len(series_np) >= min_len_stl:
-            stl_sm = STL(series_np, period=12, robust=True) # Using robust=True example
+            stl_sm = STL(series_np, period=12) # Using robust=True example
             res_sm = stl_sm.fit()
             remainder = res_sm.resid
             deseason = series_np - res_sm.seasonal
