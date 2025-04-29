@@ -2,10 +2,7 @@ import sys
 import os
 
 # --- Path Setup ---
-# Assumes this script file is located one directory below the project root
-# (e.g., in a 'testing' folder adjacent to 'src')
 try:
-    # __file__ is defined when running as a script
     PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 except NameError:
     # Fallback for interactive environments (like Jupyter basic run)
@@ -23,8 +20,11 @@ import pandas as pd
 import warnings
 import json
 from datasetsforecast.m3 import M3
-# This import should now work correctly if path setup is right
-from src.metrics import Pelt, STLFeatures, ACF_Features, CrossingPoints, LinearRegression
+from src.metrics import (
+    Pelt, STLFeatures, ACF_Features, CrossingPoints, LinearRegression,
+    EntropyPairs, SpectralEntropy, HighFluctuation
+)
+
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -33,6 +33,8 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 def test_easytest_metrics():
     """
     Analyzes M3 monthly data using custom classes from src/metrics.py.
+    Includes Pelt, STL, ACF, CrossingPoints, LinearRegression,
+    EntropyPairs, SpectralEntropy, HighFluctuation features.
     Returns a dictionary of extreme values found for each feature.
     """
     # --- Load Data ---
@@ -70,19 +72,22 @@ def test_easytest_metrics():
     all_dataset_ids = Y_df['unique_id'].unique()
     results_data = []
 
-    # --- Instantiate custom metric classes --- # <<< CORRECTIONS HERE
+    # --- Instantiate custom metric classes ---
     print("Instantiating custom metric classes...")
     try:
-        pelt_instance = Pelt() # OK - Takes no args or uses defaults
-        # OK - STLFeatures still takes freq. Using defaults for new 'seasonal' and 'robust' params.
-        stl_instance = STLFeatures(freq=12)
-        # CORRECTED: ACF_Features now takes 'nlags', not 'freq'. Using default nlags=10.
+        pelt_instance = Pelt()
+        stl_instance = STLFeatures(freq=12) # Assuming monthly data
         acf_instance = ACF_Features(nlags=10)
-        # CORRECTED: CrossingPoints now takes no arguments.
         crossing_points_instance = CrossingPoints()
-        # OK - LinearRegression takes no arguments.
-        linear_regression_instance = LinearRegression()
+        linear_regression_instance = LinearRegression() # Instantiated but fit per series     
+        entropy_pairs_instance = EntropyPairs()
+        spectral_entropy_instance = SpectralEntropy(sf=1) # Use sf=1 for monthly data (unit cycles/month)
+        high_fluctuation_instance = HighFluctuation()
+
         print("Metric classes instantiated.")
+    except NameError as e:
+         print(f"FATAL ERROR during metric instantiation: Class not found. Did you import correctly? Details: {e}")
+         return {}
     except Exception as e:
          print(f"FATAL ERROR during metric instantiation: {e}")
          return {}
@@ -108,28 +113,27 @@ def test_easytest_metrics():
         series_np = series_pd.to_numpy()
         series_len = len(series_np)
 
-        # Check minimum lengths required by calculators
-        min_len_overall = 2
-        # Get actual min_size used by this instance
+        # Check minimum lengths required by calculators <<< UPDATED HERE
+        min_len_overall = 2 # Most features need at least 2 points
         min_len_pelt = getattr(pelt_instance, 'min_size', 2)
-         # Get actual freq used by this instance
-        stl_freq = getattr(stl_instance, 'freq', 1)
-        min_len_stl = (2 * stl_freq + 1) if stl_freq > 1 else 2
-        # Get actual nlags used by this instance
-        acf_nlags = getattr(acf_instance, 'nlags', 1)
-        min_len_acf = acf_nlags + 1 # Need at least nlags+1 points for ACF
+        stl_freq = getattr(stl_instance, 'freq', 1); min_len_stl = (2 * stl_freq + 1) if stl_freq > 1 else 2
+        acf_nlags = getattr(acf_instance, 'nlags', 1); min_len_acf = acf_nlags + 1
+        # New features generally need min length 2 based on their internal checks
+        min_len_entropy_pairs = 2
+        min_len_spectral = 2
+        min_len_fluctuation = 2
 
         # Ensure series is long enough for ALL calculations intended
-        # (Add more checks if other features have stricter length needs)
-        required_len = max(min_len_overall, min_len_pelt, min_len_stl, min_len_acf)
+        required_len = max(min_len_overall, min_len_pelt, min_len_stl, min_len_acf,
+                           min_len_entropy_pairs, min_len_spectral, min_len_fluctuation)
+
         if series_len < required_len:
-             # Optional: print which check failed
-             # print(f"Skipping {dataset_id}: len {series_len} < required {required_len}")
              skipped_count += 1
              continue
         # --- End Pre-computation Checks ---
 
         processed_count += 1
+        # Initialize features dict
         current_features = {
             "unique_id": dataset_id,
             "Pelt_Num_Breakpoints": np.nan,
@@ -138,40 +142,49 @@ def test_easytest_metrics():
             "CrossingPoints": np.nan,
             "LinearRegression_Slope": np.nan,
             "LinearRegression_R2": np.nan,
+            "EntropyPairs_Value": np.nan,     
+            "SpectralEntropy_Value": np.nan,
+            "HighFluctuation_Value": np.nan   
         }
 
-        # --- Feature Extraction (with basic try-except for safety) ---
+        # --- Feature Extraction ---
         try:
             # 1. Pelt
-            pen_value = np.log(series_len) if series_len > 1 else 0 # Avoid log(1)
+            pen_value = np.log(series_len) if series_len > 1 else 0
             pelt_instance.fit(series_np)
             bkps = pelt_instance.predict(pen=pen_value)
-            # Predict returns end points, number of changes is len(bkps)-1 if bkps includes series end
-            # A single segment (0, N) gives bkps=[N], len=1 -> 0 changes.
-            # Segments (0, t1), (t1, N) gives bkps=[t1, N], len=2 -> 1 change.
-            # Handle empty bkps case (might happen on error or very short series)
             num_changepoints = len(bkps) -1 if bkps else 0
             current_features["Pelt_Num_Breakpoints"] = max(0, num_changepoints)
 
             # 2. STL
-            stl_result = stl_instance.get_features(x=series_np) # Already checked length
+            stl_result = stl_instance.get_features(x=series_np)
             current_features["STL_Trend_Strength"] = stl_result.get('trend', np.nan)
 
             # 3. ACF
-            acf_result = acf_instance.get_features(x=series_np) # Already checked length
+            acf_result = acf_instance.get_features(x=series_np)
             current_features["ACF_FirstLag"] = acf_result.get('x_acf1', np.nan)
 
             # 4. Crossing Points
-            # Pass float array, handles potential NaNs inside get_features
             cp_result = crossing_points_instance.get_features(x=series_np.astype(float))
             current_features["CrossingPoints"] = cp_result.get('crossing_points', np.nan)
 
             # 5. Linear Regression
-            # Use a new instance per fit or ensure fit resets state if reusing
-            lr_instance = LinearRegression()
+            lr_instance = LinearRegression() # Re-instantiate per series
             lr_instance.fit(time_series=series_np)
             current_features["LinearRegression_Slope"] = lr_instance.coef_
             current_features["LinearRegression_R2"] = lr_instance.score()
+
+            # 6. Entropy Pairs
+            entropy_pairs_result = entropy_pairs_instance.get_features(x=series_np)
+            current_features["EntropyPairs_Value"] = entropy_pairs_result.get('entropy_pairs', np.nan)
+
+            # 7. Spectral Entropy 
+            spectral_entropy_result = spectral_entropy_instance.get_features(x=series_np)
+            current_features["SpectralEntropy_Value"] = spectral_entropy_result.get('spectral_entropy', np.nan)
+
+            # 8. High Fluctuation
+            high_fluctuation_result = high_fluctuation_instance.get_features(x=series_np)
+            current_features["HighFluctuation_Value"] = high_fluctuation_result.get('high_fluctuation', np.nan)
 
         except Exception as e:
              print(f"ERROR calculating features for {dataset_id}: {e}")
@@ -201,26 +214,23 @@ def test_easytest_metrics():
          print(f"FATAL ERROR converting results to DataFrame: {e}")
          return {}
 
-
     # --- Calculate and Display Results ---
     print("\n--- Custom Feature Calculation Summary ---")
-    print(results_df.info())
+    print(results_df.info()) 
     print("\n--- Custom Descriptive Statistics ---")
-    # Use context manager for float formatting
     with pd.option_context('display.float_format', '{:,.4f}'.format, 'display.max_rows', None, 'display.max_columns', None, 'display.width', 1000):
-        print(results_df.describe())
+        print(results_df.describe()) 
     print("\n--- Sample of Custom Results DataFrame ---")
-    print(results_df.head())
+    print(results_df.head()) 
     print("\n--- Custom Extreme Values per Feature ---")
     extreme_results = {}
     try:
         for feature_name in results_df.select_dtypes(include=np.number).columns:
             valid_series = results_df[feature_name].dropna()
-            if valid_series.empty or not np.all(np.isfinite(valid_series)): # Check for finite values too
+            if valid_series.empty or not np.all(np.isfinite(valid_series)):
                 print(f"\nFeature: {feature_name}\n   No valid finite data found.")
                 extreme_results[feature_name] = {'lowest': (None, np.nan), 'highest': (None, np.nan)}
                 continue
-
             idx_min, val_min = valid_series.idxmin(), valid_series.min()
             idx_max, val_max = valid_series.idxmax(), valid_series.max()
             print(f"\nFeature: {feature_name}")
@@ -229,44 +239,31 @@ def test_easytest_metrics():
             extreme_results[feature_name] = {'lowest': (idx_min, val_min), 'highest': (idx_max, val_max)}
     except Exception as e:
          print(f"FATAL ERROR calculating extreme values: {e}")
-         return {} # Return empty if extremes calculation fails
-
+         return {}
 
     return extreme_results
 
-# NpEncoder class definition (keep as is)
+# NpEncoder class definition
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer): return int(obj)
-        if isinstance(obj, np.floating): return float(obj) # Handle numpy floats
+        if isinstance(obj, np.floating): return float(obj)
         if isinstance(obj, np.ndarray): return obj.tolist()
-        # Check for NaN specifically BEFORE standard JSON encoding
-        if isinstance(obj, float) and np.isnan(obj): return None # Represent NaN as null in JSON
+        if isinstance(obj, float) and np.isnan(obj): return None
         return super(NpEncoder, self).default(obj)
 
 # --- Main execution block ---
 if __name__ == "__main__":
     print(f"--- Running Custom Metrics Analysis Script ---")
-    # Add try-except around the main function call for robustness
     analysis_results = {}
     try:
         analysis_results = test_easytest_metrics()
     except Exception as e:
         print(f"\n--- SCRIPT EXECUTION FAILED ---")
         print(f"An unexpected error occurred: {e}")
-        # Optionally re-raise or exit
-        # raise e
 
     print("\n--- Script Finished ---")
     if analysis_results:
         print("Results dictionary was generated (extreme values shown above).")
-        # Example: Optionally save results to JSON
-        # try:
-        #     output_path = os.path.join(PROJECT_ROOT, 'results.json')
-        #     with open(output_path, 'w') as f:
-        #         json.dump(analysis_results, f, cls=NpEncoder, indent=4)
-        #     print(f"Results saved to {output_path}")
-        # except Exception as e:
-        #     print(f"Error saving results to JSON: {e}")
     else:
         print("Analysis did not generate results or failed.")

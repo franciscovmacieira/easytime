@@ -85,6 +85,24 @@ This feature measures the first autocorrelation coefficient (lag 1).
 
 
 
+## CrossingPoints
+
+
+
+This feature counts the number of times a time-series crosses the median line. <br>**Low value:** Means there are few/none oscillations across the time-series. <br>**High value:** Means there are frequent oscillations across the time-series.
+
+
+
+    
+![png](notebook_files/notebook_3_14.png)
+    
+
+
+
+**No Parameters**
+
+
+
 ## LinearRegression_Slope
 
 
@@ -96,7 +114,7 @@ This feature measures the overall linear trend slope.
 
 
     
-![png](notebook_files/notebook_3_14.png)
+![png](notebook_files/notebook_3_18.png)
     
 
 
@@ -116,7 +134,71 @@ This feature measures how well a linear trend fits the time-series (Coefficient 
 
 
     
-![png](notebook_files/notebook_3_18.png)
+![png](notebook_files/notebook_3_22.png)
+    
+
+
+
+**No Parameters**
+
+
+
+## EntropyPairs_Value
+
+
+
+This feature measures entropy based on the 3 quantile bins of the time-series. <br>**Low value:** Means simpler patterns in the time-series sequence. <br>**High value:** Means more complex patterns in the time-series sequence.
+
+
+
+    
+![png](notebook_files/notebook_3_26.png)
+    
+
+
+
+**No Parameters**
+
+
+
+## SpectralEntropy_Value
+
+
+
+This feature measures the forceastibility of a time-series. <br>**Low value:** Means there are strong signs of a trend across the time-series. <br>**High value:** Means the time-series is probably white-noise.
+
+
+
+    
+![png](notebook_files/notebook_3_30.png)
+    
+
+
+
+<table>
+<thead>
+<tr><th>Parameter  </th><th>Type       </th><th>Description                                                             </th><th>Default    </th></tr>
+</thead>
+<tbody>
+<tr><td>sf         </td><td>float      </td><td>Sampling frequency of the time series.                                  </td><td>(Mandatory)</td></tr>
+<tr><td>method     </td><td>str        </td><td>PSD calculation method (&quot;welch&quot; or &quot;fft&quot;).                              </td><td>&quot;welch&quot;    </td></tr>
+<tr><td>nperseg    </td><td>int or None</td><td>Segment length for Welch method. If None, defaults based on data length.</td><td>None       </td></tr>
+<tr><td>normalize  </td><td>bool       </td><td>Normalize entropy output to [0, 1].                                     </td><td>False      </td></tr>
+</tbody>
+</table>
+
+
+
+## HighFluctuation_Value
+
+
+
+Measures the proportion of large changes in the time-series. <br>**Low value:** Means few/none large fluctuations. <br>**High value:** Means many large fluctuations.
+
+
+
+    
+![png](notebook_files/notebook_3_34.png)
     
 
 

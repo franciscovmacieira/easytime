@@ -5,6 +5,7 @@ import json
 import matplotlib.pyplot as plt
 import os # Make sure os is imported
 import pprint # For printing sys.path if needed
+import sys
 
 # --- Assume necessary imports and function definitions are done above ---
 # Like: CUSTOM_SCRIPT_MODULE_NAME, CUSTOM_FUNCTION_NAME, etc.

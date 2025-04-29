@@ -1,29 +1,98 @@
-# --- Necessary Imports ---
 import numpy as np
-import pandas as pd # Used indirectly if Y_df is processed before calling these
+import pandas as pd # Used for qcut in EntropyPairs helper
 import statsmodels.api as sm
-from statsmodels.tsa.seasonal import STL
-from statsmodels.tsa.stattools import acf # Moved import here for clarity
-from statsmodels.nonparametric._smoothers_lowess import lowess # Explicit import for clarity
-from statsmodels.regression.linear_model import OLS, RegressionResults # Added RegressionResults for typing hint
+from statsmodels.tsa.seasonal import STL # Foundational: Kept for STLFeatures
+from statsmodels.tsa.stattools import acf # Foundational: Kept for ACF_Features
+from statsmodels.nonparametric._smoothers_lowess import lowess # Used in STLFeatures
+from statsmodels.regression.linear_model import OLS, RegressionResults # Foundational: Used by LinearRegression
 from statsmodels.tools.tools import add_constant
-from typing import Dict, List, Optional # Added Optional
-from math import floor
-import matplotlib.pyplot as plt # Kept for plot_fit method
+from typing import Dict, List, Optional
+from math import floor, log2 # Used by Pelt, Entropy, SpectralEntropy
+import matplotlib.pyplot as plt # For LinearRegression plot_fit method
+from collections import Counter # For EntropyPairs
+import sys
+from scipy.signal import periodogram, welch
+from scipy.stats import zscore # Import zscore function
+from ruptures.base import BaseEstimator, BaseCost
+from ruptures.costs import cost_factory
+import ctypes
+import numpy.ctypeslib as npct
+import os
 
-# Imports for Pelt (assuming ruptures is installed)
+# --- Load Compiled C Library ---
+C_LIB_LOADED = False
+c_lib = None
 try:
-    from ruptures.base import BaseEstimator, BaseCost
-    from ruptures.costs import cost_factory
-except ImportError:
-    print("Warning: 'ruptures' library not found. Pelt class will not be fully functional.")
-    # Define dummy base classes if ruptures is not installed to avoid NameErrors
-    # This allows the script to load but Pelt won't work.
-    class BaseEstimator: pass
-    class BaseCost: pass
-    def cost_factory(**kwargs): raise NotImplementedError("ruptures not installed")
+    # Determine library path and extension based on OS
+    lib_name = None
+    if sys.platform.startswith('win'):
+        lib_name = 'c_metrics.dll'
+    elif sys.platform.startswith('darwin'): # macOS
+        lib_name = 'c_metrics.dylib'
+    else: # Linux/other Unix-like
+        lib_name = 'c_metrics.so'
 
-# --- Modified Custom Classes ---
+    lib_path = os.path.join(os.path.dirname(__file__), lib_name)
+
+    if not os.path.exists(lib_path):
+        # Fallback: check current working directory
+        lib_path_cwd = os.path.join(os.getcwd(), lib_name)
+        if os.path.exists(lib_path_cwd):
+            lib_path = lib_path_cwd
+        else:
+             raise OSError(f"Shared library '{lib_name}' not found in script directory or CWD.")
+
+    c_lib = ctypes.CDLL(lib_path)
+    print(f"Successfully loaded C library: {lib_path}")
+
+    # --- Define C function signatures ---
+    # 1. MD_hrv_classic_pnn40 (for HighFluctuation)
+    c_pnn40_func = c_lib.MD_hrv_classic_pnn40
+    c_pnn40_func.argtypes = [npct.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS'), ctypes.c_int]
+    c_pnn40_func.restype = ctypes.c_double
+
+    # 2. SB_MotifThree_quantile_hh (for EntropyPairs)
+    c_motif3_func = c_lib.SB_MotifThree_quantile_hh
+    c_motif3_func.argtypes = [npct.ndpointer(dtype=np.float64, flags='C_CONTIGUOUS'), ctypes.c_int]
+    c_motif3_func.restype = ctypes.c_double
+
+    C_LIB_LOADED = True
+
+except (OSError, AttributeError, Exception) as e:
+    print(f"--- CRITICAL WARNING ---")
+    print(f"Failed to load or configure C library functions from '{lib_name}': {e}")
+    print(f"Features 'HighFluctuation' and 'EntropyPairs' will return NaN.")
+    print(f"Ensure '{lib_name}' is compiled correctly and placed next to metrics.py or in CWD.")
+    print(f"--- END WARNING ---")
+    c_pnn40_func = None
+    c_motif3_func = None
+
+# --- Helper Functions ---
+
+def _xlogx_for_entropy(p: np.ndarray, base: int = 2) -> np.ndarray:
+    """
+    Computes p * log_b(p) element-wise, returning 0 for p=0 elements.
+    Used for Shannon entropy calculation: H = -sum(_xlogx_for_entropy(p)).
+    """
+    # (Implementation from previous version)
+    p = np.asarray(p); out = np.zeros_like(p, dtype=float); mask = p > 1e-12
+    if mask.sum() == 0: return out
+    if base == 2: log_func = np.log2
+    elif base == np.e: log_func = np.log
+    else: log_func = lambda x: np.log(x) / np.log(base)
+    logs = np.full_like(p, -np.inf); logs[mask] = log_func(p[mask]); out[mask] = p[mask] * logs[mask]
+    out[~mask] = 0.0; out[np.isnan(p)] = np.nan
+    return out
+
+def poly(t: np.ndarray, degree: int) -> np.ndarray:
+    """Computes polynomial features for a time vector t."""
+    # (Implementation from previous version)
+    if degree < 0: raise ValueError("Degree cannot be negative.");
+    if t.ndim != 1: raise ValueError("Input t must be 1D."); n = len(t); X = np.empty((n, degree + 1), dtype=t.dtype)
+    for i in range(degree + 1): X[:, i] = t ** i
+    return X
+
+# --- Custom Metric Classes ---
 
 class Pelt(BaseEstimator):
     """
@@ -558,3 +627,186 @@ class LinearRegression:
         if self.results_ is None:
             raise RuntimeError("Model has not been fitted yet. Call fit() first.")
         print(self.results_.summary())
+
+
+class EntropyPairs:
+    """
+    Calculates the feature SB_MotifThree_quantile_hh by calling
+    a compiled C function. Automatically applies z-score normalization
+    to the input time series before calculation.
+    """
+    def __init__(self):
+        """Initialize EntropyPairs C wrapper."""
+        if not C_LIB_LOADED or c_motif3_func is None:
+            print("Warning: C library/function for EntropyPairs not loaded. Will return NaN.")
+
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """
+        Applies z-score normalization to the input array 'x' and then
+        calls the C function SB_MotifThree_quantile_hh.
+        """
+        output = {'entropy_pairs': np.nan}
+        if not C_LIB_LOADED or c_motif3_func is None: return output
+
+        # --- Input Validation and Conversion ---
+        if not isinstance(x, np.ndarray):
+            try: x = np.asarray(x, dtype=float)
+            except: print("Warning: EntropyPairs input invalid."); return output
+        if x.ndim != 1: print("Warning: EntropyPairs input not 1D."); return output
+        n = len(x)
+
+        # NaN/Inf Check
+        if np.isnan(x).any() or np.isinf(x).any():
+            print("Warning: EntropyPairs input contains NaN/Inf. Cannot z-score reliably. Returning NaN.")
+            return output
+
+        # --- Z-Score Normalization ---
+        x_processed = x 
+        if n > 1: # Need at least 2 points for std dev calculation
+            std_dev = np.std(x)
+            # Check if std dev is meaningfully non-zero to avoid division by zero
+            if std_dev > 1e-8:
+                try:
+                    # Apply z-score normalization (ddof=0 matches np.std default)
+                    x_processed = zscore(x, ddof=0)
+                except Exception as e_zscore:
+                    print(f"Warning: zscore calculation failed for EntropyPairs: {e_zscore}")
+                    # Fallback to using original data if zscore fails unexpectedly
+                    x_processed = x
+
+        # --- Call C Function ---
+        try:
+            # Ensure type and contiguity for ctypes using the potentially normalized array
+            x_c = np.ascontiguousarray(x_processed, dtype=np.float64)
+            # Call C function with the processed data
+            result = c_motif3_func(x_c, n)
+            output['entropy_pairs'] = float(result) if not np.isnan(result) else np.nan
+
+        except Exception as e:
+            print(f"Warning: Call to C function SB_MotifThree_quantile_hh failed: {e}")
+            # Output already initialized with NaN
+
+        return output
+
+
+
+class SpectralEntropy:
+    """Calculates the Spectral Entropy using scipy.signal for PSD."""
+    def __init__(self, sf: float, method: str = "welch", nperseg: Optional[int] = None, normalize: bool = False):
+        """Initialize SpectralEntropy."""
+        if sf <= 0: raise ValueError("Sampling frequency 'sf' must be positive.")
+        if method not in ['fft', 'welch']: raise ValueError("Method must be 'fft' or 'welch'.")
+        self.sf=sf; self.method=method; self.nperseg=nperseg; self.normalize=normalize
+
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """Calculates spectral entropy using scipy.signal PSD methods."""
+        output = {'spectral_entropy': np.nan}; axis = -1 # Operate on last axis
+
+        # Basic validation and cleaning
+        if not isinstance(x, np.ndarray):
+            try: x = np.asarray(x, dtype=float)
+            except: print("Warning: SpectralEntropy input invalid. Returning NaN."); return output
+        if x.ndim != 1: print("Warning: SpectralEntropy input not 1D. Returning NaN."); return output
+        x_clean = x[~np.isnan(x) & ~np.isinf(x)]; n_clean = len(x_clean)
+        if n_clean < 2: return output # Need >= 2 points for PSD
+
+        try:
+            # Calculate PSD using scipy.signal
+            if self.method == "fft":
+                freqs, psd = periodogram(x_clean, fs=self.sf, axis=axis)
+            elif self.method == "welch":
+                seg_len = self.nperseg if self.nperseg is not None else min(256, n_clean) # Use min for default nperseg
+                # Ensure nperseg is not larger than series length for welch
+                if n_clean < seg_len:
+                    freqs, psd = periodogram(x_clean, fs=self.sf, axis=axis)
+                else:
+                    freqs, psd = welch(x_clean, fs=self.sf, nperseg=seg_len, axis=axis)
+
+            # Check for empty or zero PSD
+            if psd is None or psd.size == 0 or np.sum(psd) < 1e-12:
+                output['spectral_entropy'] = 0.0 # Entropy of zero signal is zero
+                return output
+
+            # Normalize PSD to get probability distribution
+            psd_norm = psd / np.sum(psd, axis=axis) # Normalizes along the axis
+
+            # Calculate Shannon entropy using helper
+            # Ensure psd_norm is 1D if input x was 1D
+            psd_norm_1d = psd_norm.ravel()
+            se = -_xlogx_for_entropy(psd_norm_1d, base=2).sum()
+
+            # Apply normalization if requested
+            if self.normalize:
+                size_psd = psd_norm_1d.size
+                if size_psd > 1:
+                    se /= log2(size_psd)
+                elif size_psd == 1: # Avoid division by log2(1)=0
+                    se = 0.0 # Normalized entropy of single point is 0
+
+            output['spectral_entropy'] = se
+
+        except Exception as e:
+            print(f"Warning: SpectralEntropy calculation failed: {e}")
+
+        return output
+
+
+class HighFluctuation:
+    """
+    Calculates the feature MD_hrv_classic_pnn40 by calling
+    a compiled C function. Automatically applies z-score normalization
+    to the input time series before calculation.
+    """
+    def __init__(self):
+        """Initialize HighFluctuation C wrapper."""
+        if not C_LIB_LOADED or c_pnn40_func is None:
+            print("Warning: C library/function for HighFluctuation not loaded. Will return NaN.")
+        # Parameters (threshold=40, scale=1000) are assumed inside the C function
+
+    def get_features(self, x: np.ndarray) -> Dict[str, float]:
+        """
+        Applies z-score normalization to the input array 'x' and then
+        calls the C function MD_hrv_classic_pnn40.
+        """
+        output = {'high_fluctuation': np.nan}
+        if not C_LIB_LOADED or c_pnn40_func is None: return output
+
+        # --- Input Validation and Conversion ---
+        if not isinstance(x, np.ndarray):
+            try: x = np.asarray(x, dtype=float)
+            except: print("Warning: HighFluctuation input invalid."); return output
+        if x.ndim != 1: print("Warning: HighFluctuation input not 1D."); return output
+        n = len(x)
+
+        # NaN/Inf Check (C code might handle, but z-score won't work well with them)
+        if np.isnan(x).any() or np.isinf(x).any():
+            print("Warning: HighFluctuation input contains NaN/Inf. Cannot z-score reliably. Returning NaN.")
+            return output
+
+        # --- Z-Score Normalization ---
+        x_processed = x # Default to original if normalization fails or isn't needed
+        if n > 1: # Need at least 2 points for std dev calculation
+            std_dev = np.std(x)
+            # Check if std dev is meaningfully non-zero to avoid division by zero
+            if std_dev > 1e-8:
+                try:
+                    # Apply z-score normalization (ddof=0 matches np.std default)
+                    x_processed = zscore(x, ddof=0)
+                except Exception as e_zscore:
+                    print(f"Warning: zscore calculation failed for HighFluctuation: {e_zscore}")
+                    # Fallback to using original data if zscore fails unexpectedly
+                    x_processed = x
+
+        # --- Call C Function ---
+        try:
+            # Ensure type and contiguity for ctypes using the potentially normalized array
+            x_c = np.ascontiguousarray(x_processed, dtype=np.float64)
+            # Call C function with the processed data
+            result = c_pnn40_func(x_c, n)
+            output['high_fluctuation'] = float(result) if not np.isnan(result) else np.nan
+
+        except Exception as e:
+            print(f"Warning: Call to C function MD_hrv_classic_pnn40 failed: {e}")
+            # Output already initialized with NaN
+
+        return output
