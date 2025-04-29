@@ -118,7 +118,7 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-# /site
+#/site  <-- THIS LINE IS NOW COMMENTED OUT
 
 # mypy
 .mypy_cache/
