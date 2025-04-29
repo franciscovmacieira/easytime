@@ -1,0 +1,19 @@
+mkdocs
+mkdocs-material  # Or your preferred MkDocs theme (e.g., mkdocs-readthedocs)
+mkdocstrings      # If you plan to use automatic API documentation from docstrings
+# mkdocstrings-python # If using the Python handler for mkdocstrings
+
+# Core dependencies for EasyTest (adjust versions as needed)
+numpy>=1.23.5
+pandas>=2.2.1
+statsmodels>=0.14.0
+scikit-learn>=1.2.0
+ruptures
+matplotlib
+
+# Development dependencies (for testing, linting, etc.)
+pytest>=7.1
+# Add other development dependencies, e.g.,
+# black>=23.10
+# flake8>=6.1
+# mypy>=1.0
