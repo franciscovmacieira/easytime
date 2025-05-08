@@ -118,7 +118,7 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-#/site  <-- THIS LINE IS NOW COMMENTED OUT
+site/ # This will ignore the 'site' directory and all its contents
 
 # mypy
 .mypy_cache/
@@ -127,6 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# **__pycache__ # This line seems redundant or misplaced, common practice is __pycache__/ at the top
+# If you have __pycache__ directories in subfolders that are not being ignored by the top-level __pycache__/,
+# you might intend something like **/__pycache__/ but the initial __pycache__/ should cover most cases.
+# For clarity, I'll keep the original structure but note that the top-level __pycache__/ is usually sufficient.
 **__pycache__
 
 # PyCharm
@@ -140,3 +145,7 @@ dmypy.json
 
 # MacOS
 .DS_Store
+
+# Custom Ignores
+mkdocs_prompts # This will ignore the file named 'mkdocs_prompts' at any level
+
