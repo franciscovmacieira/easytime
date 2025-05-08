@@ -1,9 +1,0 @@
-Terminal: cmd.exe
-
-cd C:\Users\Utilizador\Desktop\Faculdade\Projeto Investigação - Séries Temporais\EasyTest
-
-.venv\Scripts\activate.bat
-
-python build_docs.py
-
-mkdocs build --clean
