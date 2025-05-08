@@ -1,7 +1,21 @@
-site_name: EasyTest
+site_name: Deep Time Series Analysis
 nav:
     - Home: index.md
-    - Documentation: notebook.md
+    - Documentation:
+        - Trend Analysis:
+            - Trend Strength: features/trend/trend_strength.md
+            - Median Crosses: features/trend/median_crosses.md
+            - Trend Changes: features/trend/trend_changes.md
+            - Linear Regression: features/trend/linear_regression.md
+        - Noise/Complexity:
+            - Series Forecastability: features/noise/forecastability.md
+            - Entropy Pairs: features/noise/entropy_pairs.md
+            - Series Fluctuation: features/noise/fluctuation.md
+        - Seasonality Detection:
+            - Autocorrelation Relevance: features/noise/ac_relevance.md
+            - Seasonal Strength: features/noise/seasonal_strength.md
+        - Noise/Complexity:
+            - Window Fluctuation: features/noise/window_fluctuation.md
     - API Reference: api_reference.md
     - Changelog: changelog.md
     - Code of Conduct: conduct.md
@@ -10,7 +24,9 @@ nav:
 theme:
   name: material
   features:
-    - toc.integrate 
+    - navigation.expand
+    - toc.integrate
+
 docs_dir: docs
 use_directory_urls: false
 
@@ -25,3 +41,6 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
+
+extra_css:
+ - stylesheets/custom.css

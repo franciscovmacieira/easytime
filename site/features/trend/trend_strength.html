@@ -9,20 +9,22 @@
       
       
       
+        <link rel="prev" href="../../index.html">
       
-        <link rel="next" href="features/trend/trend_strength.html">
+      
+        <link rel="next" href="median_crosses.html">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
     
     
       
-        <title>Deep Time Series Analysis</title>
+        <title>Trend Strength - Deep Time Series Analysis</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
       
 
@@ -41,9 +43,9 @@
       
     
     
-      <link rel="stylesheet" href="stylesheets/custom.css">
+      <link rel="stylesheet" href="../../stylesheets/custom.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -62,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#index" class="md-skip">
+        <a href="#trend_strength" class="md-skip">
           Skip to content
         </a>
       
@@ -78,7 +80,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="index.html" title="Deep Time Series Analysis" class="md-header__button md-logo" aria-label="Deep Time Series Analysis" data-md-component="logo">
+    <a href="../../index.html" title="Deep Time Series Analysis" class="md-header__button md-logo" aria-label="Deep Time Series Analysis" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -98,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Trend Strength
             
           </span>
         </div>
@@ -178,7 +180,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="index.html" title="Deep Time Series Analysis" class="md-nav__button md-logo" aria-label="Deep Time Series Analysis" data-md-component="logo">
+    <a href="../../index.html" title="Deep Time Series Analysis" class="md-nav__button md-logo" aria-label="Deep Time Series Analysis" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -193,32 +195,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Home
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="index.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
         
   
   
@@ -229,53 +209,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
-    <span class="md-ellipsis">
-      Purpose
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#project" class="md-nav__link">
-    <span class="md-ellipsis">
-      Project
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      Context
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -284,20 +217,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -313,7 +246,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Documentation
@@ -324,20 +257,20 @@
                 
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
         
           
           <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
@@ -353,7 +286,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_1">
             <span class="md-nav__icon md-icon"></span>
             Trend Analysis
@@ -364,10 +297,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="features/trend/trend_strength.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Trend Strength
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="trend_strength.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -378,6 +331,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#trend_strength" class="md-nav__link">
+    <span class="md-ellipsis">
+      trend_strength
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -390,7 +370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/trend/median_crosses.html" class="md-nav__link">
+      <a href="median_crosses.html" class="md-nav__link">
         
   
   
@@ -413,7 +393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/trend/trend_changes.html" class="md-nav__link">
+      <a href="trend_changes.html" class="md-nav__link">
         
   
   
@@ -436,7 +416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/trend/linear_regression.html" class="md-nav__link">
+      <a href="linear_regression.html" class="md-nav__link">
         
   
   
@@ -507,7 +487,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/forecastability.html" class="md-nav__link">
+      <a href="../noise/forecastability.html" class="md-nav__link">
         
   
   
@@ -530,7 +510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/entropy_pairs.html" class="md-nav__link">
+      <a href="../noise/entropy_pairs.html" class="md-nav__link">
         
   
   
@@ -553,7 +533,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/fluctuation.html" class="md-nav__link">
+      <a href="../noise/fluctuation.html" class="md-nav__link">
         
   
   
@@ -624,7 +604,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/ac_relevance.html" class="md-nav__link">
+      <a href="../noise/ac_relevance.html" class="md-nav__link">
         
   
   
@@ -647,7 +627,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/seasonal_strength.html" class="md-nav__link">
+      <a href="../noise/seasonal_strength.html" class="md-nav__link">
         
   
   
@@ -718,7 +698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/noise/window_fluctuation.html" class="md-nav__link">
+      <a href="../noise/window_fluctuation.html" class="md-nav__link">
         
   
   
@@ -756,7 +736,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api_reference.html" class="md-nav__link">
+      <a href="../../api_reference.html" class="md-nav__link">
         
   
   
@@ -778,7 +758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="changelog.html" class="md-nav__link">
+      <a href="../../changelog.html" class="md-nav__link">
         
   
   
@@ -800,7 +780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="conduct.html" class="md-nav__link">
+      <a href="../../conduct.html" class="md-nav__link">
         
   
   
@@ -822,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contributing.html" class="md-nav__link">
+      <a href="../../contributing.html" class="md-nav__link">
         
   
   
@@ -844,7 +824,7 @@
   
   
     <li class="md-nav__item">
-      <a href="requirements.html" class="md-nav__link">
+      <a href="../../requirements.html" class="md-nav__link">
         
   
   
@@ -875,13 +855,89 @@
 
 
 
-<h1 id="index">Index</h1>
-<h2 id="purpose">Purpose</h2>
-<p>The purpose of this repository is to create a python library to help developers dealing with time-series analysis.</p>
-<h2 id="project">Project</h2>
-<p>This library will include several features to deal with different scenarios of time-series analysis: Trend Analysis, Seasonality Detection, Noise, Outliers, Model Selection and Classification.</p>
-<h2 id="context">Context</h2>
-<p>This is part of an investigation project executed by FCUP student Francisco Macieira in the context of his Artificial Intelligence and Data Science bachelor, with the help of FCUP and FEUP professor Moisés Santos.</p>
+  <h1>Trend Strength</h1>
+
+<h2 id="trend_strength">trend_strength</h2>
+<p>Computes the strength of a trend within the time-series.<br />
+<strong>Low value:</strong> A value close to zero means there are few/none indicators of a trend in the time series.<br />
+<strong>High value:</strong> A value close to one means there are strong signs of the series containing a trend.</p>
+<p><img alt="png" src="trend_strength_output_5_0.png" /></p>
+<h3>Parameters Table</h3>
+
+<style type="text/css">
+#T_d2389 th {
+  background-color: #f2f2f2;
+  color: black;
+  font-weight: bold;
+  text-align: left;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+#T_d2389_row0_col0, #T_d2389_row1_col0, #T_d2389_row2_col0 {
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #ddd;
+  padding: 5px;
+  min-width: 100px;
+  font-weight: bold;
+}
+#T_d2389_row0_col1, #T_d2389_row1_col1, #T_d2389_row2_col1 {
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #ddd;
+  padding: 5px;
+  min-width: 60px;
+}
+#T_d2389_row0_col2, #T_d2389_row1_col2, #T_d2389_row2_col2 {
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #ddd;
+  padding: 5px;
+  min-width: 120px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+#T_d2389_row0_col3, #T_d2389_row1_col3, #T_d2389_row2_col3 {
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #ddd;
+  padding: 5px;
+  min-width: 300px;
+  max-width: 450px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+</style>
+<table id="T_d2389">
+  <thead>
+    <tr>
+      <th id="T_d2389_level0_col0" class="col_heading level0 col0" >Parameter</th>
+      <th id="T_d2389_level0_col1" class="col_heading level0 col1" >Type</th>
+      <th id="T_d2389_level0_col2" class="col_heading level0 col2" >Default</th>
+      <th id="T_d2389_level0_col3" class="col_heading level0 col3" >Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="T_d2389_row0_col0" class="data row0 col0" >period</td>
+      <td id="T_d2389_row0_col1" class="data row0 col1" >int</td>
+      <td id="T_d2389_row0_col2" class="data row0 col2" >'1'</td>
+      <td id="T_d2389_row0_col3" class="data row0 col3" >Frequency of the time series (e.g. 12 for monthly)</td>
+    </tr>
+    <tr>
+      <td id="T_d2389_row1_col0" class="data row1 col0" >seasonal</td>
+      <td id="T_d2389_row1_col1" class="data row1 col1" >int</td>
+      <td id="T_d2389_row1_col2" class="data row1 col2" >7</td>
+      <td id="T_d2389_row1_col3" class="data row1 col3" >Length of the seasonal smoother (must be odd).</td>
+    </tr>
+    <tr>
+      <td id="T_d2389_row2_col0" class="data row2 col0" >robust</td>
+      <td id="T_d2389_row2_col1" class="data row2 col1" >bool</td>
+      <td id="T_d2389_row2_col2" class="data row2 col2" >False</td>
+      <td id="T_d2389_row2_col3" class="data row2 col3" >Flag for robust fitting.</td>
+    </tr>
+  </tbody>
+</table>
 
 
 
@@ -930,10 +986,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["navigation.expand", "toc.integrate"], "search": "assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.expand", "toc.integrate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
       
     
   </body>
