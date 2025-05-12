@@ -1,26 +1,40 @@
 site_name: Deep Time Series Analysis
 nav:
-    - Home: index.md
+    - Home:
+        - Overview: index.md 
     - Documentation:
         - Trend Analysis:
-            - Trend Strength: features/trend/trend_strength.md
-            - Median Crosses: features/trend/median_crosses.md
-            - Trend Changes: features/trend/trend_changes.md
-            - Linear Regression: features/trend/linear_regression.md
-        - Noise/Complexity:
-            - Series Forecastability: features/noise/forecastability.md
-            - Entropy Pairs: features/noise/entropy_pairs.md
-            - Series Fluctuation: features/noise/fluctuation.md
+            - Trend Strength: features/trend_strength.md
+            - Median Crosses: features/median_crosses.md
+            - Trend Changes: features/trend_changes.md
+            - Linear Regression: features/linear_regression.md
+        - Noise/Complexity: 
+            - Series Forecastability: features/forecastability.md
+            - Entropy Pairs: features/entropy_pairs.md
+            - Series Fluctuation: features/fluctuation.md
         - Seasonality Detection:
-            - Autocorrelation Relevance: features/noise/ac_relevance.md
-            - Seasonal Strength: features/noise/seasonal_strength.md
-        - Noise/Complexity:
-            - Window Fluctuation: features/noise/window_fluctuation.md
-    - API Reference: api_reference.md
-    - Changelog: changelog.md
-    - Code of Conduct: conduct.md
-    - Contributing: contributing.md
-    - Requirements: requirements.md
+            - Autocorrelation Relevance: features/ac_relevance.md
+            - Seasonal Strength: features/seasonal_strength.md
+        - Volatility/Outliers:
+            - Window Fluctuation: features/window_fluctuation.md
+        - Model Selection:
+            - Short-Term Variation: features/st_variation.md
+            - Autocorrelation: features/ac.md
+            - Series Complexity: features/complexity.md
+        - Clustering/Classification:
+            - Records Concentration: features/rec_concentration.md
+            - Series Centroid: features/centroid.md
+    - API Reference:
+        - Reference: api_reference.md 
+    - Changelog:
+        - Log: changelog.md 
+    - Code of Conduct:
+        - Conduct: conduct.md 
+    - Contributing:
+        - Guide: contributing.md 
+    - Requirements:
+        - List: requirements.md
+
 theme:
   name: material
   features:

@@ -77,7 +77,13 @@ def test_deeptsanalysis_metrics():
             "Series Fluctuation": np.nan,
             "Autocorrelation Relevance": np.nan,
             "Seasonal Strength": np.nan,
-            "Window Fluctuation": np.nan
+            "Window Fluctuation": np.nan,
+            "Short-Term Variation": np.nan,
+            "Autocorrelation": np.nan,
+            "Differenced Series": np.nan,
+            "Series Complexity": np.nan,
+            "Records Concentration": np.nan,
+            "Series Centroid": np.nan
         }
 
         metrics_instance = Metrics(series_np)
@@ -92,6 +98,12 @@ def test_deeptsanalysis_metrics():
         current_features["Autocorrelation Relevance"] = metrics_instance.ac_relevance()
         current_features["Seasonal Strength"] = metrics_instance.seasonal_strength()
         current_features["Window Fluctuation"] = metrics_instance.window_fluctuation()
+        current_features["Short-Term Variation"] = metrics_instance.st_variation()
+        current_features["Autocorrelation"] = metrics_instance.ac()
+        current_features["Differenced Series"] = metrics_instance.diff_series()
+        current_features["Series Complexity"] = metrics_instance.complexity()
+        current_features["Records Concentration"] = metrics_instance.rec_concentration()
+        current_features["Series Centroid"] = metrics_instance.centroid(fs=12)
 
         results_data.append(current_features)
 

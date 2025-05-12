@@ -21,16 +21,21 @@ if sys.platform == 'win32':
 notebook_in_path = 'docs/notebook.ipynb'
 output_base_dir = 'docs'
 build_tasks = {
-    'features/trend/trend_strength.md': ['trend_strength'],
-    'features/trend/median_crosses.md': ['median_crosses'],
-    'features/trend/trend_changes.md': ['trend_changes'],
-    'features/trend/linear_regression.md': ['linear_regression'],
-    'features/noise/forecastability.md': ['forecastability'],
-    'features/noise/entropy_pairs.md': ['entropy_pairs'],
-    'features/noise/fluctuation.md': ['fluctuation'],
-    'features/noise/ac_relevance.md': ['ac_relevance'],
-    'features/noise/seasonal_strength.md': ['seasonal_strength'],
-    'features/noise/window_fluctuation.md': ['window_fluctuation']
+    'features/trend_strength.md': ['trend_strength'],
+    'features/median_crosses.md': ['median_crosses'],
+    'features/trend_changes.md': ['trend_changes'],
+    'features/linear_regression.md': ['linear_regression'],
+    'features/forecastability.md': ['forecastability'],
+    'features/entropy_pairs.md': ['entropy_pairs'],
+    'features/fluctuation.md': ['fluctuation'],
+    'features/ac_relevance.md': ['ac_relevance'],
+    'features/seasonal_strength.md': ['seasonal_strength'],
+    'features/window_fluctuation.md': ['window_fluctuation'],
+    'features/st_variation.md': ['st_variation'],
+    'features/ac.md': ['ac'],
+    'features/complexity.md': ['complexity'],
+    'features/rec_concentration.md': ['rec_concentration'],
+    'features/centroid.md': ['centroid']
 }
 
 # --- Tag Definitions ---

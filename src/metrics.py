@@ -6,6 +6,8 @@ from sklearn.linear_model import LinearRegression as SkLearnLinearRegression
 from statsmodels.tsa.seasonal import STL
 import antropy as ant
 import pycatch22
+import ruptures as rpt
+import tsfel
 
 # Metrics Class
 
@@ -102,6 +104,126 @@ class Metrics ():
         feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
         fluct = feature_dict.get('SC_FluctAnal_2_rsrangefit_50_1_logi_prop_r1', np.nan)
         return fluct
+    
+    # Model Selection
+    
+    def st_variation(self): # Short-Term Variation
+        series_list = self.series.tolist()
+        catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
+        feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
+        variation = feature_dict.get('CO_trev_1_num', np.nan)
+        return variation
+    
+    def ac (self): # AutoCorrelation
+        result_dict = tsfeatures.acf_features(self.series)
+        ac = result_dict['x_acf1']
+        return ac
+    
+    def diff_series(self): # Differenced Series
+        result_dict = tsfeatures.acf_features(self.series)
+        diff = result_dict['diff1_acf10']
+        return diff
+    
+
+    # Helper functions to Series Complexity
+    # ----------------------------------------------------------------------------------------------
+
+    def z_normalize(self, series: np.ndarray) -> np.ndarray: # Z-Normalization
+        mean = np.mean(series)
+        std_dev = np.std(series)
+        if std_dev < 1e-10:
+            return np.zeros_like(series)
+        else:
+            return (series - mean) / std_dev
+
+    def calculate_ce(self, series: np.ndarray) -> float: #Complexity Estimate
+        if series.ndim != 1:
+            raise ValueError("Input series must be 1-dimensional.")
+        if len(series) < 2:
+            return 0.0
+        # Handle cases where the segment was constant before normalization
+        if np.allclose(series, 0):
+            return 0.0
+        diffs = np.diff(series)
+        ce_val = np.linalg.norm(diffs)
+        return ce_val
+
+    # ----------------------------------------------------------------------------------------------
+
+    def complexity(self, window_size: int = 5, penalty_value: float = None, model: str = "rbf", min_size: int = 2) -> int:
+        # --- Input Validation ---
+        if not isinstance(self.series, np.ndarray):
+            self.series = np.asarray(self.series, dtype=float)
+        if self.series.ndim != 1:
+            raise ValueError("Input self.series must be 1-dimensional.")
+        n = len(self.series)
+        if window_size < 2 or window_size > n:
+            raise ValueError(f"window_size must be between 2 and len(self.series)={n}.")
+        if n < window_size + min_size : # Need at least one full window and min_size samples after
+            print(f"Warning: self.series length ({n}) is too short for window size ({window_size}) and min_size ({min_size}). Returning empty list.")
+            return []
+
+        # --- Calculate Rolling Complexity Estimate ---
+        rolling_ce = []
+        for i in range(n - window_size + 1):
+            segment = self.series[i : i + window_size]
+            # Normalize segment before calculating CE for robustness to local scale/offset
+            segment_norm = self.z_normalize(segment)
+            ce_val = self.calculate_ce(segment_norm)
+            rolling_ce.append(ce_val)
+
+        rolling_ce_np = np.array(rolling_ce)
+
+        if len(rolling_ce_np) < min_size * 2: # Need enough points for change detection
+            print(f"Warning: Rolling complexity self.series is too short ({len(rolling_ce_np)}) for min_size ({min_size}). Returning empty list.")
+            return []
+
+        # --- Detect Change Points in Rolling CE ---
+        try:
+            n_ce = len(rolling_ce_np)
+            if penalty_value is None:
+                sigma = np.std(rolling_ce_np)
+                if sigma < 1e-8: # Handle constant CE self.series
+                    print("Warning: Rolling complexity is constant. No change points will be detected.")
+                    return []
+                penalty_value = 3 * np.log(n_ce) # Default penalty value
+
+            algo = rpt.Pelt(model=model, min_size=min_size).fit(rolling_ce_np)
+            change_points_ce_indices = algo.predict(pen=penalty_value)
+
+            # Remove the last point which is always the length of the signal
+            if len(change_points_ce_indices) > 0 and change_points_ce_indices[-1] == n_ce:
+                change_points_ce_indices = change_points_ce_indices[:-1]
+
+        except ImportError:
+            print("Error: The 'ruptures' library is required for change point detection.")
+            print("Please install it: pip install ruptures")
+            raise # Re-raise the import error
+        except Exception as e:
+            print(f"Error during change point detection: {e}")
+            return [] # Return empty list on error
+
+        indices = [idx + window_size - 1 for idx in change_points_ce_indices]
+
+        return len(indices)
+    
+    # Clustering/Classification
+
+    def rec_concentration(self): # Records Concentration
+        series_list = self.series.tolist()
+        catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
+        feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
+        concentration = feature_dict.get('DN_HistogramMode_10', np.nan)
+        return concentration
+    
+    def centroid(self, fs: int): # Series Centroid
+        centroid_value = tsfel.feature_extraction.features.calc_centroid(self.series, fs)
+        return float(centroid_value)
+
+    
+
+
+
 
 
     
