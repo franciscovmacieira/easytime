@@ -586,6 +586,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="fluctuation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,30 @@
 
   <h1>Series Fluctuation</h1>
 
-<h2 id="fluctuation">fluctuation</h2>
+<h2 id="fluctuation"><strong>fluctuation</strong></h2>
 <p>Measures the proportion of large changes in the time-series.<br />
 <strong>Low value:</strong> Means few/none large fluctuations.<br />
 <strong>High value:</strong> Means many large fluctuations.</p>
 <p><img alt="png" src="fluctuation_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Z-Normalization:</strong> First, the time series Yt is z-normalized.</p>
+</li>
+<li>
+<p><strong>Successive Differences:</strong> Then the absolute differences between consecutive values of the z-normalized series are calculated.</p>
+</li>
+<li>
+<p><strong>Thresholding and Counting:</strong> The counting of the number of absolute differences that are greater than a defined threshold (0.04) is computed.</p>
+</li>
+<li>
+<p><strong>Proportion:</strong> The final value, which is returned, is the proportion of such differences.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Financial Market Volatility:</strong> In analyzing stock price differences, a high value might indicate a "jumpy" market with frequent large price changes over short intervals, signaling higher risk or specific trading conditions.</p>
+<p><strong>Wearable Health Monitoring:</strong> For activity data from a wearable, a higher value could distinguish between smooth, consistent activity and erratic, stop-and-go movements.</p>
 
 
 

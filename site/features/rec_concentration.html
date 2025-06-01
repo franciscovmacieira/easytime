@@ -939,6 +939,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="rec_concentration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,33 @@
 
   <h1>Records Concentration</h1>
 
-<h2 id="rec_concentration">rec_concentration</h2>
+<h2 id="rec_concentration"><strong>rec_concentration</strong></h2>
 <p>Computes the relative position of the most probable value in relation to the mean.</p>
 <p><strong>Low value:</strong> Means the most frequent values of the series are concentrated significantly below the mean.<br />
 <strong>High value:</strong> Means the most frequent values of the series are concentrated significantly above the mean.</p>
 <p><img alt="png" src="rec_concentration_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Data Range:</strong> The minimum and maximum values of the time series are determined.</p>
+</li>
+<li>
+<p><strong>Binning:</strong> The calculated range is divided into 10 equal-width bins.</p>
+</li>
+<li>
+<p><strong>Histogram:</strong> The number of data points from the time series that fall into each of the 10 bins are counted.</p>
+</li>
+<li>
+<p><strong>Mode Identification:</strong> The bin with the highest count (the modal bin) is identified.</p>
+</li>
+<li>
+<p><strong>Feature Value:</strong> The returned value is the midpoint (center value) of this modal bin.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Customer Segmentation:</strong> While analyzing customer purchase frequency data, this feature might reveal common purchasing patterns (most customers buy 2-3 times a month, for example), helping to segment customers.</p>
+<p><strong>Sensor Data Validation:</strong> If a sensor typically outputs values concentrated in a specific range, a shift in this feature could indicate a calibration issue or a real change in the measured environment.</p>
 
 
 

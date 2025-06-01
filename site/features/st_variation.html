@@ -822,6 +822,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="st_variation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,24 @@
 
   <h1>Short-Term Variation</h1>
 
-<h2 id="st_variation">st_variation</h2>
+<h2 id="st_variation"><strong>st_variation</strong></h2>
 <p>Computes the average of the cube of sucessive time-series differences.</p>
 <p><strong>Low value:</strong> Means the average of the short-term variation across the series is low.<br />
 <strong>High value:</strong> Means the average of the short-term variation across the series is high, indicating a frantic behaviour of the data points.</p>
 <p><img alt="png" src="st_variation_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Sucessive Differences:</strong> Iterate through the time series from the second point to the penultimate point (t=1 to N−1), computing a comparison between each Yt point and its previous Yt-1 point.</p>
+</li>
+<li>
+<p><strong>Final Counting:</strong> The number of times Yt &gt; Yt−1 is then counted and returned.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Quality Control:</strong> In a manufacturing process, if a product dimension shows low short-term variation, it suggests stability. An increase in reversals might indicate an emerging issue.</p>
+<p><strong>Algorithmic Trading:</strong> A high number of local upward movements might suggest short-term momentum that a trading algorithm could try to exploit.</p>
 
 
 

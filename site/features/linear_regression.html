@@ -469,6 +469,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="linear_regression_slope">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -477,6 +510,39 @@
       linear_regression_r2
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="linear_regression_r2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1365,18 +1431,48 @@
 
   <h1>Linear Regression</h1>
 
-<h2 id="linear_regression_slope">linear_regression_slope</h2>
+<h2 id="linear_regression_slope"><strong>linear_regression_slope</strong></h2>
 <p>Measures the overall linear trend slope.<br />
 <strong>Low value:</strong> A negative value means there is a downward trend.<br />
 <strong>High value:</strong> A positive value means an upward trend.</p>
 <p><img alt="png" src="linear_regression_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
-<h2 id="linear_regression_r2">linear_regression_r2</h2>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Linear Regression Fitting:</strong> First, the linear regression model yi=β0+β1xi is fitted, yielding predicted values yi.</p>
+</li>
+<li>
+<p><strong>Ordinary Least Squares (OLS):</strong> Then, the returned value (slope β1) is estimated by minimizing the sum of squared residuals.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Resource Depletion:</strong> While analyzing the production data of an oil well, the linear regression slope can estimate the average rate of decline in production per month, helping to forecast its remaining lifespan.</p>
+<p><strong>Agricultural Yields:</strong> Farmers can use the slope from regressing crop yield against year to understand the average annual increase or decrease in productivity due to factors like soil changes or farming practices.</p>
+<h2 id="linear_regression_r2"><strong>linear_regression_r2</strong></h2>
 <p>Measures how well a linear trend fits the time-series.<br />
 <strong>Low value:</strong> A value close to zero means a linear model explains little variance.<br />
 <strong>High value:</strong> A value close to one means a linear model explains much of the variance.</p>
-<p><img alt="png" src="linear_regression_output_8_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<p><img alt="png" src="linear_regression_output_10_0.png" /></p>
+<h5 id="no-parameters_1"><strong>No Parameters</strong></h5>
+<h5 id="calculation_1"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Linear Regression Fitting:</strong> First, the linear regression model yi=β0+β1xi is fitted, yielding predicted values y^i.</p>
+</li>
+<li>
+<p><strong>Total Sum of Squares (SST):</strong> The total variance in the observed data is then computed as SST.</p>
+</li>
+<li>
+<p><strong>Sum of Squared Residual (SSR):</strong> The variance not explained by the model is computed as SSR.</p>
+</li>
+<li>
+<p><strong>R-squared Calculation:</strong> The R² value, calculated as R²=1−SST/SSR, is returned.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples_1"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Software Performance:</strong> When analyzing software response time over increasing user load, R² indicates how much of the performance degradation is linearly related to the load. A low R² might suggest other non-linear factors are at play.</p>
+<p><strong>Educational Assessment:</strong> If tracking student test scores over a semester, R² for a linear fit can show how much of the score improvement is explained by a steady learning trend versus other influences.</p>
 
 
 

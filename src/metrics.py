@@ -3,10 +3,8 @@ from statsmodels.tsa.seasonal import STL
 from ruptures.detection import Pelt 
 import tsfeatures
 from sklearn.linear_model import LinearRegression as SkLearnLinearRegression
-from statsmodels.tsa.seasonal import STL
 import antropy as ant
 import pycatch22
-import ruptures as rpt
 import tsfel
 
 # Metrics Class
@@ -59,7 +57,7 @@ class Metrics ():
     
     def forecastability(self, sf, method="welch", nperseg=None, normalize=False): # Series Forecastabality
         spec_entropy = ant.spectral_entropy(self.series, sf=sf, method=method, nperseg=nperseg, normalize=normalize)
-        return spec_entropy
+        return 1/spec_entropy
     
     def entropy_pairs(self): # Entropy Pairs
         series_list = self.series.tolist()
@@ -123,95 +121,65 @@ class Metrics ():
         result_dict = tsfeatures.acf_features(self.series)
         diff = result_dict['diff1_acf10']
         return diff
-    
 
-    # Helper functions to Series Complexity
-    # ----------------------------------------------------------------------------------------------
+    # --- Helper Functions for Series Complexity Feature ---
 
-    def z_normalize(self, series: np.ndarray) -> np.ndarray: # Z-Normalization
-        mean = np.mean(series)
-        std_dev = np.std(series)
-        if std_dev < 1e-10:
-            return np.zeros_like(series)
-        else:
-            return (series - mean) / std_dev
+    def z_normalize(self, ts: np.ndarray) -> np.ndarray: # Z-Normalization
+        """
+        Z-normalizes a time series.
+        A constant series will be normalized to a series of zeros.
+        """
+        mean_ts = np.mean(ts)
+        std_ts = np.std(ts)
+        if std_ts == 0:
+            return np.zeros_like(ts, dtype=np.float64)
+        return (ts - mean_ts) / std_ts
 
-    def calculate_ce(self, series: np.ndarray) -> float: #Complexity Estimate
-        if series.ndim != 1:
-            raise ValueError("Input series must be 1-dimensional.")
-        if len(series) < 2:
-            return 0.0
-        # Handle cases where the segment was constant before normalization
-        if np.allclose(series, 0):
-            return 0.0
-        diffs = np.diff(series)
-        ce_val = np.linalg.norm(diffs)
-        return ce_val
+    def calculate_raw_ce(self, ts_normalized: np.ndarray) -> float: # Complexity Estimate
+        """
+        Calculates the Complexity Estimate (CE) for a z-normalized time series.
+        CE(Q) = sqrt(sum_{i=1}^{n-1} (q_i - q_{i+1})^2)
+        """
+        if len(ts_normalized) < 2:
+            return 0.0 
+        
+        diff_ts = np.diff(ts_normalized) 
+        ce = np.sqrt(np.sum(diff_ts**2))
+        return ce
 
-    # ----------------------------------------------------------------------------------------------
+    #--------------------------------------------------
 
-    def complexity(self, window_size: int = 5, penalty_value: float = None, model: str = "rbf", min_size: int = 2) -> int:
-        # --- Input Validation ---
-        if not isinstance(self.series, np.ndarray):
-            self.series = np.asarray(self.series, dtype=float)
-        if self.series.ndim != 1:
-            raise ValueError("Input self.series must be 1-dimensional.")
-        n = len(self.series)
-        if window_size < 2 or window_size > n:
-            raise ValueError(f"window_size must be between 2 and len(self.series)={n}.")
-        if n < window_size + min_size : # Need at least one full window and min_size samples after
-            print(f"Warning: self.series length ({n}) is too short for window size ({window_size}) and min_size ({min_size}). Returning empty list.")
-            return []
 
-        # --- Calculate Rolling Complexity Estimate ---
-        rolling_ce = []
-        for i in range(n - window_size + 1):
-            segment = self.series[i : i + window_size]
-            # Normalize segment before calculating CE for robustness to local scale/offset
-            segment_norm = self.z_normalize(segment)
-            ce_val = self.calculate_ce(segment_norm)
-            rolling_ce.append(ce_val)
+    def complexity(self) -> float: # Series Complexity
+        """
+        Calculates the Complexity Estimate (CE) for the time series.
+        This CE is a measure of the complexity of a single time series, as defined
+        in "CID: An efficient complexity-invariant distance for time series".
+        """
+        series_np = np.asarray(self.series, dtype=np.float64)
 
-        rolling_ce_np = np.array(rolling_ce)
+        if series_np.ndim != 1:
+            raise ValueError("Input series (self.series) must be 1-dimensional.")
+        
+        if len(series_np) < 2:
+            raise ValueError(
+                f"Series (self.series) must have at least 2 data points to calculate "
+                f"its complexity estimate. Current length: {len(series_np)}"
+            )
 
-        if len(rolling_ce_np) < min_size * 2: # Need enough points for change detection
-            print(f"Warning: Rolling complexity self.series is too short ({len(rolling_ce_np)}) for min_size ({min_size}). Returning empty list.")
-            return []
+        # 1. Z-normalize the series
+        normalized_series = self.z_normalize(series_np)
 
-        # --- Detect Change Points in Rolling CE ---
-        try:
-            n_ce = len(rolling_ce_np)
-            if penalty_value is None:
-                sigma = np.std(rolling_ce_np)
-                if sigma < 1e-8: # Handle constant CE self.series
-                    print("Warning: Rolling complexity is constant. No change points will be detected.")
-                    return []
-                penalty_value = 3 * np.log(n_ce) # Default penalty value
+        # 2. Calculate Complexity Estimate (CE)
+        complexity_estimate = self.calculate_raw_ce(normalized_series)
+        
+        return complexity_estimate
 
-            algo = rpt.Pelt(model=model, min_size=min_size).fit(rolling_ce_np)
-            change_points_ce_indices = algo.predict(pen=penalty_value)
-
-            # Remove the last point which is always the length of the signal
-            if len(change_points_ce_indices) > 0 and change_points_ce_indices[-1] == n_ce:
-                change_points_ce_indices = change_points_ce_indices[:-1]
-
-        except ImportError:
-            print("Error: The 'ruptures' library is required for change point detection.")
-            print("Please install it: pip install ruptures")
-            raise # Re-raise the import error
-        except Exception as e:
-            print(f"Error during change point detection: {e}")
-            return [] # Return empty list on error
-
-        indices = [idx + window_size - 1 for idx in change_points_ce_indices]
-
-        return len(indices)
-    
     # Clustering/Classification
 
     def rec_concentration(self): # Records Concentration
-        series_list = self.series.tolist()
-        catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
+        self.series_list = self.series.tolist()
+        catch22_raw_results = pycatch22.catch22_all(self.series_list, catch24=False)
         feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
         concentration = feature_dict.get('DN_HistogramMode_10', np.nan)
         return concentration
@@ -219,6 +187,30 @@ class Metrics ():
     def centroid(self, fs: int): # Series Centroid
         centroid_value = tsfel.feature_extraction.features.calc_centroid(self.series, fs)
         return float(centroid_value)
+    
+    # Information
+
+    def info(): #Information
+        print("\nSmall description of the features." \
+        "\nFor the full documentation see the library oficial website: {website link} or the library GitHub repository: https://github.com/franciscovmacieira/Deep-Time-Series-Analysis.git" \
+        "\ntrend_strength: Computes the strength of a trend within the time-series." \
+        "\nmedian_crosses: Counts the number of times the time-series crosses its median." \
+        "\ntrend_changes: Detects the number of trend changes in the time-series." \
+        "\nlinear_regression_slope: Computes the slope of a linear regression fitted to the time-series." \
+        "\nlinear_regression_r2: Computes the R-squared value of a linear regression fitted to the time-series." \
+        "\nforecastability: Measures the forecastability of the time-series using spectral entropy." \
+        "\nentropy_pairs: Computes the entropy of the time-series." \
+        "\nfluctuation: Measures the fluctuation of the time-series." \
+        "\nac_relevance: Computes the autocorrelation relevance of the time-series." \
+        "\nseasonal_strength: Computes the strength of seasonality within the time-series." \
+        "\nwindow_fluctuation: Measures the proportion of fluctuations in short windows of the time-series." \
+        "\nst_variation: Computes the short-term variation of the time-series." \
+        "\nac: Computes the autocorrelation of the time-series." \
+        "\ndiff_series: Computes the autocorrelation value of the differenced series." \
+        "\ncomplexity: Computes the complexity of the time-series." \
+        "\nrec_concentration: Computes the relative position of the most frequent values in relation to the mean." \
+        "\ncentroid: Computes the centroid of the time-series.\n" \
+        )
 
     
 

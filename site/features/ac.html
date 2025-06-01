@@ -845,6 +845,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ac">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -853,6 +886,39 @@
       diff_series
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="diff_series">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1365,18 +1431,48 @@
 
   <h1>Autocorrelation</h1>
 
-<h2 id="ac">ac</h2>
+<h2 id="ac"><strong>ac</strong></h2>
 <p>Computes the autocorrelation of the time-series.</p>
 <p><strong>Low value:</strong> Means the linear relationship between current and past values in the series is very low.<br />
 <strong>High value:</strong> Means the linear relationship between current and past values in the sries is very high, and usually indicates one or more trends.</p>
 <p><img alt="png" src="ac_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
-<h2 id="diff_series">diff_series</h2>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Lag 1 Autocovariance:</strong> The autocovariance at lag 1 (c1) is calculated.</p>
+</li>
+<li>
+<p><strong>Lag 0 Autocovariance:</strong> The autocovariance at lag 0 (c0) is also calculated.</p>
+</li>
+<li>
+<p><strong>Autocorrelation Value:</strong> The autocorrelation value that is computed and returned is calculated as: ρ1 = c0 * c1.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Demand Forecasting:</strong> If daily sales data has a high positive lag-1 autocorrelation, it means high sales one day are likely followed by high sales the next, useful for short-term inventory adjustments.</p>
+<p><strong>Energy Load Prediction:</strong> Electricity load often shows strong positive lag-1 autocorrelation, as load at one hour is very similar to the previous hour, crucial for grid balancing.</p>
+<h2 id="diff_series"><strong>diff_series</strong></h2>
 <p>Computes the autocorrelation value of the differenced series.</p>
 <p><strong>Low value:</strong> Means there is no linear relationship between past and current values in the de-trended series.<br />
 <strong>High value:</strong> Means there is a significant linear relationship between past and current values in the de-trended series.</p>
-<p><img alt="png" src="ac_output_8_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<p><img alt="png" src="ac_output_10_0.png" /></p>
+<h5 id="no-parameters_1"><strong>No Parameters</strong></h5>
+<h5 id="calculation_1"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>First Differencing:</strong> A new time series is created by taking the first differences of the original series, DYt = Yt+1 − Yt for t=1,...,N−1.</p>
+</li>
+<li>
+<p><strong>Autocorrelation of Differenced Series:</strong> Then the first 10 autocorrelation coefficients (ρ1,ρ2,...,ρ10) of the differenced series are calculated, using the same method as the ac feature.</p>
+</li>
+<li>
+<p><strong>Sum of Squares:</strong> The returned value is calculated as the sum of the squares of these first 10 autocorrelation coefficients.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples_1"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Financial Returns Analysis:</strong> Stock prices are often non-stationary (have a trend/random walk). Analyzing the autocorrelation of their differences (returns) helps identify if there's any remaining predictability after removing the primary random walk component.</p>
+<p><strong>Process Improvement:</strong> If a process output shows a trend, differencing can make it stationary. This feature can then reveal if there are lingering systematic patterns in the rate of change that could be addressed.</p>
 
 
 

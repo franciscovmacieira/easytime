@@ -751,6 +751,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="window_fluctuation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,45 @@
 
   <h1>Window Fluctuation</h1>
 
-<h2 id="window_fluctuation">window_fluctuation</h2>
+<h2 id="window_fluctuation"><strong>window_fluctuation</strong></h2>
 <p>Measures the proportion of large changes over short time-windows.</p>
 <p><strong>Low value:</strong> Means the fluctuation of the time-series is more structured and shows few signs of randomness.<br />
 <strong>High value:</strong> Means the fluctuation of the time-series shows signs of randomness.</p>
 <p><img alt="png" src="window_fluctuation_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Defining Window Sizes:</strong> Approximately 50 window sizes are generated, logarithmically spaced from a minimum defined size up to half the series length. Duplicates are removed and if fewer than 12 unique τ values remain, the feature returns 0.</p>
+</li>
+<li>
+<p><strong>Cumulative Sum:</strong> The series is then transformed into its cumulative sum.</p>
+</li>
+<li>
+<p><strong>Fluctuation Calculation (for each Window Size):</strong> For each unique window size the cumulative sum series is divided into non-overlapping segments of length τ. For each segment:</p>
+<ul>
+<li>A linear trend is fitted to the segment data points and then is subtracted to get a detrended segment.</li>
+<li>For the "rsrangefit" method: The squared range of this detrended segment is calculated.</li>
+<li>For the "dfa" method: The sum of squares of the values in the detrended segment is calculated.
+The values for all segments are then aggregated.</li>
+</ul>
+</li>
+<li>
+<p><strong>Log-Log Analysis and Breakpoint Detection:</strong> The logarithms of the window sizes and their corresponding fluctuation values are computed using an algorithm that searches for an optimal breakpoint. This is done by iterating through possible split points. For each split point i:</p>
+<ul>
+<li>Fit a linear regression to the first i points.</li>
+<li>Fit another linear regression to the remaining points.</li>
+<li>Calculate the sum of squared errors (residuals) for both fits. The total sum of squared errors for this split point i is stored.
+The split point i that yields the minimum total sum of squared errors is chosen as the optimal breakpoint. A minimum number of points is required for each regression.</li>
+</ul>
+</li>
+<li>
+<p><strong>Final Computation:</strong> The final computed and returned value is the proportion of window sizes that fall into the first linear segment (before the optimal breakpoint).</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Financial Time Series:</strong> Can help distinguish between periods of persistent trending (Hurst exponent &gt; 0.5) and anti-persistent, mean-reverting behavior (Hurst &lt; 0.5) in asset prices, informing trading strategies.</p>
+<p><strong>Geophysical Data Analysis:</strong> In analyzing earthquake data or river flow levels, this feature can characterize the long-range dependence or memory effects, helping to understand the underlying physical processes.</p>
 
 
 

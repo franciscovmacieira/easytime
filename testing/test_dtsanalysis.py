@@ -19,8 +19,10 @@ def test_deeptsanalysis_metrics():
     Analyzes M3 monthly data using the Metrics class.
     Includes Trend Changes, Trend Strength, Median Crosses,
         Linear Regression Slope, Linear Regression R2,
-        Entropy Pairs, Series Forecastability and Series Fluctuation.
-    Returns a dictionary of extreme values found for each feature.
+        Entropy Pairs, Series Forecastability, Series Fluctuation,
+        Number of Breakpoints, and Breakpoints (list).
+    Returns a dictionary of extreme values found for each numeric feature
+    and the full DataFrame of all computed metrics.
     """
 
     data_dir = os.path.join(PROJECT_ROOT, 'data', 'm3_download')
@@ -58,9 +60,13 @@ def test_deeptsanalysis_metrics():
         if series_pd.isnull().any() or not np.isfinite(series_pd).all():
             skipped_count += 1
             continue
-        if series_pd.nunique() <= 1:
+        if series_pd.nunique() <= 1: # Skip series with no variance or too few unique points
             skipped_count += 1
             continue
+        if len(series_pd) < 2: # Skip series that are too short for some metrics
+            skipped_count +=1
+            continue
+
 
         series_np = series_pd.to_numpy()
 
@@ -80,10 +86,10 @@ def test_deeptsanalysis_metrics():
             "Window Fluctuation": np.nan,
             "Short-Term Variation": np.nan,
             "Autocorrelation": np.nan,
-            "Differenced Series": np.nan,
-            "Series Complexity": np.nan,
+            "Differenced Series": np.nan, 
+            "Series Complexity": np.nan,            
             "Records Concentration": np.nan,
-            "Series Centroid": np.nan
+            "Series Centroid": np.nan,
         }
 
         metrics_instance = Metrics(series_np)
@@ -93,17 +99,20 @@ def test_deeptsanalysis_metrics():
         current_features["Linear Regression Slope"] = metrics_instance.linear_regression_slope()
         current_features["Linear Regression R2"] = metrics_instance.linear_regression_r2()
         current_features["Entropy Pairs"] = metrics_instance.entropy_pairs()
-        current_features["Series Forecastability"] = metrics_instance.forecastability(sf=1)
+        current_features["Series Forecastability"] = metrics_instance.forecastability(sf=1) 
         current_features["Series Fluctuation"] = metrics_instance.fluctuation()
         current_features["Autocorrelation Relevance"] = metrics_instance.ac_relevance()
         current_features["Seasonal Strength"] = metrics_instance.seasonal_strength()
-        current_features["Window Fluctuation"] = metrics_instance.window_fluctuation()
-        current_features["Short-Term Variation"] = metrics_instance.st_variation()
+        current_features["Window Fluctuation"] = metrics_instance.window_fluctuation() 
+        current_features["Short-Term Variation"] = metrics_instance.st_variation() 
         current_features["Autocorrelation"] = metrics_instance.ac()
         current_features["Differenced Series"] = metrics_instance.diff_series()
         current_features["Series Complexity"] = metrics_instance.complexity()
-        current_features["Records Concentration"] = metrics_instance.rec_concentration()
+        current_features["Records Concentration"] = metrics_instance.rec_concentration() 
         current_features["Series Centroid"] = metrics_instance.centroid(fs=12)
+
+        metrics_instance = Metrics(series_np)
+
 
         results_data.append(current_features)
 
@@ -114,79 +123,95 @@ def test_deeptsanalysis_metrics():
 
     if not results_data:
         print("No data was processed successfully.")
-        return {}
+        return {}, None
 
     results_df = pd.DataFrame(results_data)
 
     print("\n--- Calculation Summary ---")
     if not results_df.empty:
-        print(results_df.info())
-        print("\n--- Metrics Descriptive Statistics ---")
+        print(results_df.info()) 
+        print("\n--- Metrics Descriptive Statistics (Numeric Features) ---")
         with pd.option_context('display.float_format', '{:,.4f}'.format, 'display.max_rows', None, 'display.max_columns', None, 'display.width', 1000):
-            print(results_df.describe())
+            print(results_df.describe(include=np.number)) 
         print("\n--- Sample of Results DataFrame ---")
-        print(results_df.head())
+        with pd.option_context('display.max_colwidth', 50):
+            print(results_df.head())
     else:
         print("Results DataFrame is empty.")
 
 
-    print("\n--- Metrics Extreme Values per Feature ---")
+    print("\n--- Metrics Extreme Values per Numeric Feature ---")
     extreme_results = {}
     if not results_df.empty:
-        for feature_name in results_df.select_dtypes(include=np.number).columns:
+        numeric_cols = results_df.select_dtypes(include=np.number).columns
+        for feature_name in numeric_cols:
+            if feature_name == 'unique_id': continue
+
             valid_series = results_df[feature_name].dropna()
-            if valid_series.empty or not np.all(np.isfinite(valid_series)):
+            valid_series = valid_series[np.isfinite(valid_series)]
+
+            if valid_series.empty:
                 print(f"\nFeature: {feature_name}\n    No valid finite data found.")
                 extreme_results[feature_name] = {'lowest': (None, np.nan), 'highest': (None, np.nan)}
                 continue
-            idx_min, val_min = valid_series.idxmin(), valid_series.min()
-            idx_max, val_max = valid_series.idxmax(), valid_series.max()
+            
+            idx_min = valid_series.idxmin()
+            val_min = valid_series.min()
+            idx_max = valid_series.idxmax()
+            val_max = valid_series.max()
+            
             actual_low_id = results_df.loc[idx_min, 'unique_id']
             actual_high_id = results_df.loc[idx_max, 'unique_id']
+            
             print(f"\nFeature: {feature_name}")
             print(f"    Lowest:  ID = {actual_low_id}, Value = {val_min:.4f}")
             print(f"    Highest: ID = {actual_high_id}, Value = {val_max:.4f}")
             extreme_results[feature_name] = {'lowest': (actual_low_id, val_min), 'highest': (actual_high_id, val_max)}
-
     else:
         print("Cannot calculate extreme values as results DataFrame is empty.")
 
-
     return extreme_results
+
 
 def save_extreme_values_table_as_image(extreme_results, output_filename="extreme_values_summary.png"):
     """
     Creates a table image from the extreme_results dictionary and saves it.
-
     """
     if not extreme_results:
         print("No extreme results to generate table image.")
         return
 
-    data_for_df = []
+    data_for_df_list = []
+    
+    final_columns = ["Feature Name", "Lowest Value", "Lowest ID", 
+                     "Highest Value", "Highest ID"]
+
     for feature, extremes in extreme_results.items():
         id_min, val_min = extremes.get('lowest', (None, np.nan))
         id_max, val_max = extremes.get('highest', (None, np.nan))
-        data_for_df.append({
+
+        row_data = {
             "Feature Name": feature,
             "Lowest Value": f"{val_min:.4f}" if pd.notna(val_min) else "N/A",
             "Lowest ID": str(id_min) if pd.notna(id_min) else "N/A",
             "Highest Value": f"{val_max:.4f}" if pd.notna(val_max) else "N/A",
             "Highest ID": str(id_max) if pd.notna(id_max) else "N/A",
-        })
+        }
+        data_for_df_list.append(row_data)
 
-    if not data_for_df:
+    if not data_for_df_list:
         print("No data processed for the table image.")
         return
 
-    df = pd.DataFrame(data_for_df)
+    df = pd.DataFrame(data_for_df_list, columns=final_columns).fillna("N/A")
 
-    fig, ax = plt.subplots(figsize=(12, max(4, len(df) * 0.5)))
+    fig_width = 12 # Default width
+
+    fig, ax = plt.subplots(figsize=(fig_width, max(4, len(df) * 0.6)))
     ax.axis('tight')
     ax.axis('off')
 
     fig.suptitle("Extreme Feature Values Summary", fontsize=16, y=0.95)
-
 
     table = ax.table(cellText=df.values,
                      colLabels=df.columns,
@@ -200,40 +225,50 @@ def save_extreme_values_table_as_image(extreme_results, output_filename="extreme
     for (i, j), cell in table.get_celld().items():
         if i == 0: 
             cell.set_text_props(weight='bold')
+        cell.set_height(0.05) 
 
-    plt.tight_layout(pad=1.5)
+    plt.tight_layout(pad=2.0)
 
     if os.path.isabs(output_filename):
         full_output_path = output_filename
     else:
         full_output_path = os.path.join(PROJECT_ROOT, output_filename)
 
-    try:
-        plt.savefig(full_output_path, bbox_inches='tight', dpi=200)
-        print(f"\nTable image saved to: {full_output_path}")
-    except Exception as e:
-        print(f"Error saving table image: {e}")
-    finally:
-        plt.close(fig)
+    plt.savefig(full_output_path, bbox_inches='tight', dpi=200)
+    print(f"\nTable image saved to: {full_output_path}")
+    plt.close(fig) 
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer): return int(obj)
         if isinstance(obj, np.floating): return float(obj)
         if isinstance(obj, np.ndarray): return obj.tolist()
-        if isinstance(obj, float) and np.isnan(obj): return None
+        if isinstance(obj, float) and np.isnan(obj): return None 
         if pd.isna(obj): return None
         return super(NpEncoder, self).default(obj)
 
 if __name__ == "__main__":
-    analysis_results = {}
+    
     analysis_results = test_deeptsanalysis_metrics()
-
+    Metrics.info()
 
     print("\n--- Script Finished ---")
-    if analysis_results:
-        print("Results dictionary was generated (extreme values shown above).")
+    if analysis_results is not None:
+        print("Results dictionary and DataFrame were generated.")
+        print("Extreme values for numeric features (from dictionary):")
+            
         image_output_name = "metrics_table.png"
         save_extreme_values_table_as_image(analysis_results, output_filename=image_output_name)
+        
+        json_output_path = os.path.join(PROJECT_ROOT, "full_metrics_results.json")
+        try:
+            extreme_json_path = os.path.join(PROJECT_ROOT, "extreme_metrics_results.json")
+            with open(extreme_json_path, 'w') as f_extreme_json:
+                json.dump(analysis_results, f_extreme_json, cls=NpEncoder, indent=4)
+            print(f"Extreme values dictionary saved to: {extreme_json_path}")
+
+        except Exception as e:
+            print(f"Error saving results to JSON: {e}")
+
     else:
         print("Analysis did not generate results or failed.")

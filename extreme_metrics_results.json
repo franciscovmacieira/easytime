@@ -1,0 +1,172 @@
+{
+    "Trend Changes": {
+        "lowest": [
+            "M1263",
+            11
+        ],
+        "highest": [
+            "M1048",
+            28
+        ]
+    },
+    "Trend Strength": {
+        "lowest": [
+            "M115",
+            0.035279068828902194
+        ],
+        "highest": [
+            "M1169",
+            0.9999097197036091
+        ]
+    },
+    "Median Crosses": {
+        "lowest": [
+            "M1001",
+            1
+        ],
+        "highest": [
+            "M1120",
+            84
+        ]
+    },
+    "Linear Regression Slope": {
+        "lowest": [
+            "M1079",
+            -216.9190063667675
+        ],
+        "highest": [
+            "M1265",
+            297.23401534526846
+        ]
+    },
+    "Linear Regression R2": {
+        "lowest": [
+            "M1394",
+            1.3032076185970354e-06
+        ],
+        "highest": [
+            "M809",
+            0.9969092697687861
+        ]
+    },
+    "Entropy Pairs": {
+        "lowest": [
+            "M1087",
+            1.166396448144873
+        ],
+        "highest": [
+            "M17",
+            2.1950062828134924
+        ]
+    },
+    "Series Forecastability": {
+        "lowest": [
+            "M474",
+            0.17892278112694784
+        ],
+        "highest": [
+            "M1170",
+            3.1638519724967056
+        ]
+    },
+    "Series Fluctuation": {
+        "lowest": [
+            "M1293",
+            0.06716417910447761
+        ],
+        "highest": [
+            "M10",
+            1.0
+        ]
+    },
+    "Autocorrelation Relevance": {
+        "lowest": [
+            "M226",
+            0.4707849157865647
+        ],
+        "highest": [
+            "M1124",
+            33.48754028839806
+        ]
+    },
+    "Seasonal Strength": {
+        "lowest": [
+            "M1188",
+            0.08187237607175735
+        ],
+        "highest": [
+            "M505",
+            0.9982170417351214
+        ]
+    },
+    "Window Fluctuation": {
+        "lowest": [
+            "M1009",
+            0.15384615384615385
+        ],
+        "highest": [
+            "M1000",
+            0.8461538461538461
+        ]
+    },
+    "Short-Term Variation": {
+        "lowest": [
+            "M695",
+            -3.0708682531469633
+        ],
+        "highest": [
+            "M688",
+            1.8720659020214998
+        ]
+    },
+    "Autocorrelation": {
+        "lowest": [
+            "M226",
+            -0.3426950134382205
+        ],
+        "highest": [
+            "M1008",
+            0.9923566841422474
+        ]
+    },
+    "Differenced Series": {
+        "lowest": [
+            "M1411",
+            0.005764193689708059
+        ],
+        "highest": [
+            "M1292",
+            5.267819422822453
+        ]
+    },
+    "Series Complexity": {
+        "lowest": [
+            "M1293",
+            0.3250503387250497
+        ],
+        "highest": [
+            "M1120",
+            19.456339116735894
+        ]
+    },
+    "Records Concentration": {
+        "lowest": [
+            "M1280",
+            -1.528253732554751
+        ],
+        "highest": [
+            "M888",
+            1.4121976634224525
+        ]
+    },
+    "Series Centroid": {
+        "lowest": [
+            "M1411",
+            1.0845036133022121
+        ],
+        "highest": [
+            "M1202",
+            10.03839506002336
+        ]
+    }
+}

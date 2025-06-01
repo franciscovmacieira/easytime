@@ -657,6 +657,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ac_relevance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,24 @@
 
   <h1>Autocorrelation Relevance</h1>
 
-<h2 id="ac_relevance">ac_relevance</h2>
+<h2 id="ac_relevance"><strong>ac_relevance</strong></h2>
 <p>Measures the first time lag at which the autocorrelation function drops below 1/e.</p>
 <p><strong>Low value:</strong> Means the series has a more unpredicatble behaviour.<br />
 <strong>High value:</strong> Means the series has a more predictable behaviour.</p>
 <p><img alt="png" src="ac_relevance_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Autocovariance Function (ACVF):</strong> The autocovariance function of the time series Yt is computed for various lags k.</p>
+</li>
+<li>
+<p><strong>First 1/e-Crossing:</strong> The feature value is computed and returned as the smallest positive for which ACVF(k) crosses the defined 1/e threshold. </p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Speech Processing:</strong> In analyzing a speech signal, the first zero-crossing of the autocovariance can be related to the fundamental frequency (pitch) of voiced segments, helping in speech recognition or speaker identification.</p>
+<p><strong>Climate Science:</strong> For temperature data, this feature might indicate the dominant short-term cyclical component (related to diurnal cycles if data is high frequency, for example).</p>
 
 
 

@@ -962,6 +962,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="centroid">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,15 +1380,13 @@
 
   <h1>Series Centroid</h1>
 
-<h2 id="centroid">centroid</h2>
+<h2 id="centroid"><strong>centroid</strong></h2>
 <p>Computes the centroid along the time axis.</p>
 <p><strong>Low value:</strong> Means the primary/patterns fluctuations of the series occur slowly.<br />
 <strong>High value:</strong> Means the primary patterns/fluctuations of the series occur rapidly, with fast and short-term changes.</p>
 <p><img alt="png" src="centroid_output_5_0.png" /></p>
-<h3>Parameters Table</h3>
-
 <style type="text/css">
-#T_6946d th {
+#T_bc82e th {
   background-color: #f2f2f2;
   color: black;
   font-weight: bold;
@@ -1372,7 +1394,7 @@
   border: 1px solid #ddd;
   padding: 5px;
 }
-#T_6946d_row0_col0 {
+#T_bc82e_row0_col0 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -1380,14 +1402,14 @@
   min-width: 100px;
   font-weight: bold;
 }
-#T_6946d_row0_col1 {
+#T_bc82e_row0_col1 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
   padding: 5px;
   min-width: 60px;
 }
-#T_6946d_row0_col2 {
+#T_bc82e_row0_col2 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -1396,7 +1418,7 @@
   white-space: normal;
   word-wrap: break-word;
 }
-#T_6946d_row0_col3 {
+#T_bc82e_row0_col3 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -1407,24 +1429,37 @@
   word-wrap: break-word;
 }
 </style>
-<table id="T_6946d">
+<table id="T_bc82e">
   <thead>
     <tr>
-      <th id="T_6946d_level0_col0" class="col_heading level0 col0" >Parameter</th>
-      <th id="T_6946d_level0_col1" class="col_heading level0 col1" >Type</th>
-      <th id="T_6946d_level0_col2" class="col_heading level0 col2" >Default</th>
-      <th id="T_6946d_level0_col3" class="col_heading level0 col3" >Description</th>
+      <th id="T_bc82e_level0_col0" class="col_heading level0 col0" >Parameter</th>
+      <th id="T_bc82e_level0_col1" class="col_heading level0 col1" >Type</th>
+      <th id="T_bc82e_level0_col2" class="col_heading level0 col2" >Default</th>
+      <th id="T_bc82e_level0_col3" class="col_heading level0 col3" >Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_6946d_row0_col0" class="data row0 col0" >fs</td>
-      <td id="T_6946d_row0_col1" class="data row0 col1" >int</td>
-      <td id="T_6946d_row0_col2" class="data row0 col2" >Mandatory</td>
-      <td id="T_6946d_row0_col3" class="data row0 col3" >Sampling frequency</td>
+      <td id="T_bc82e_row0_col0" class="data row0 col0" >fs</td>
+      <td id="T_bc82e_row0_col1" class="data row0 col1" >int</td>
+      <td id="T_bc82e_row0_col2" class="data row0 col2" >Mandatory</td>
+      <td id="T_bc82e_row0_col3" class="data row0 col3" >Sampling frequency</td>
     </tr>
   </tbody>
 </table>
+
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Power Spectral Density (PSD):</strong> The PSD of the time series is computed, which shows the power of the signal at each frequency f.</p>
+</li>
+<li>
+<p><strong>Centroid Calculation:</strong> The spectral centroid C, which is returned, is computed as the power-weighted average of the frequencies. The sum is over all frequency bins k.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Audio Analysis:</strong> In music information retrieval, the spectral centroid distinguishes between "bright" sounds (high centroid, like cymbals) and "dull" sounds (low centroid, like a bass drum), aiding in instrument recognition or genre classification.</p>
+<p><strong>Vibration Analysis:</strong> For machine diagnostics, a shift in the spectral centroid of vibration signals can indicate changes in operational speed or the emergence of specific fault frequencies (bearing defects often have characteristic high-frequency components, for example).</p>
 
 
 

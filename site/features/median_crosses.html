@@ -423,6 +423,39 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="median_crosses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#practical-usefulness-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Usefulness Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1356,12 +1389,27 @@
 
   <h1>Median Crosses</h1>
 
-<h2 id="median_crosses">median_crosses</h2>
+<h2 id="median_crosses"><strong>median_crosses</strong></h2>
 <p>Counts the number of times a time-series crosses the median line.<br />
 <strong>Low value:</strong> Means there are few/none oscillations across the time-series.<br />
 <strong>High value:</strong> Means there are frequent oscillations across the time-series.</p>
 <p><img alt="png" src="median_crosses_output_5_0.png" /></p>
-<p><strong>No parameters</strong></p>
+<h5 id="no-parameters"><strong>No Parameters</strong></h5>
+<h5 id="calculation"><strong>Calculation</strong></h5>
+<ol>
+<li>
+<p><strong>Median Value:</strong> The median value of the entire time series is calculated.</p>
+</li>
+<li>
+<p><strong>Crosses Counting:</strong> Then, for each point Yt and its preceding point Yt−1, if (Yt&gt;median and Yt−1&lt;median) or (Yt<median and Yt−1>median) a crossing is counted.</p>
+</li>
+<li>
+<p><strong>Total Count:</strong> The total count of crossings is returned.</p>
+</li>
+</ol>
+<h5 id="practical-usefulness-examples"><strong>Practical Usefulness Examples</strong></h5>
+<p><strong>Process Control:</strong> In manufacturing, if a quality metric frequently crosses its median, it might indicate process instability requiring investigation, even if the average remains acceptable.</p>
+<p><strong>Environmental Monitoring:</strong> Tracking how often a pollutant level crosses its long-term median can highlight periods of increased fluctuation or unusual activity.</p>
 
 
 
