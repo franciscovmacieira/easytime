@@ -1400,79 +1400,49 @@
 <hr />
 <h2 id="functions-reference">Functions Reference</h2>
 <h4 id="trend_strengthseries-period1-seasonal7-robustfalse">trend_strength(series, period=1, seasonal=7, robust=False)</h4>
-<div class="highlight"><pre><span></span><code>```
-strength = easyts.trend_strength(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">strength</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">trend_strength</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="trend_changesseries-modell2-min_size2-jump5-paramsnone-custom_costnone">trend_changes(series, model="l2", min_size=2, jump=5, params=None, custom_cost=None)</h4>
-<div class="highlight"><pre><span></span><code>```
-changes = easyts.trend_changes(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">changes</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">trend_changes</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="linear_regression_slopeseries">linear_regression_slope(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-slope = easyts.linear_regression_slope(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">slope</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">linear_regression_slope</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="linear_regression_r2series">linear_regression_r2(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-r2_score = easyts.linear_regression_r2(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">r2_score</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">linear_regression_r2</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="forecastabilityseries-sf-methodwelch-npersegnone-normalizefalse">forecastability(series, sf, method="welch", nperseg=None, normalize=False)</h4>
-<div class="highlight"><pre><span></span><code>```
-entropy = easyts.forecastability(my_series, sf=1.0)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">entropy</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">forecastability</span><span class="p">(</span><span class="n">my_series</span><span class="p">,</span> <span class="n">sf</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="fluctuationseries">fluctuation(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-fluc = easyts.fluctuation(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">fluc</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">fluctuation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="window_fluctuationseries">window_fluctuation(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-win_fluc = easyts.window_fluctuation(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">win_fluc</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">window_fluctuation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="seasonal_strengthseries-period1-seasonal7-robustfalse">seasonal_strength(series, period=1, seasonal=7, robust=False)</h4>
-<div class="highlight"><pre><span></span><code>```
-season_str = easyts.seasonal_strength(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">season_str</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">seasonal_strength</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="ac_relevanceseries">ac_relevance(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-relevance = easyts.ac_relevance(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">relevance</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">ac_relevance</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="st_variationseries">st_variation(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-variation = easyts.st_variation(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">variation</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">st_variation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="diff_seriesseries">diff_series(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-diff_acf = easyts.diff_series(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">diff_acf</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">diff_series</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="complexityseries">complexity(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-comp = easyts.complexity(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">comp</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">complexity</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="rec_concentrationseries">rec_concentration(series)</h4>
-<div class="highlight"><pre><span></span><code>```
-concentration = easyts.rec_concentration(my_series)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">concentration</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">rec_concentration</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="centroidseries-fs1">centroid(series, fs=1)</h4>
-<div class="highlight"><pre><span></span><code>```
-spec_centroid = easyts.centroid(my_series, fs=1)
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">spec_centroid</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">my_series</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="info">info()</h4>
-<div class="highlight"><pre><span></span><code>```
-easyts.info()
-```
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">easyts</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div>
 
 
