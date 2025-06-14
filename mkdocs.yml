@@ -1,35 +1,29 @@
-site_name: Deep Time Series Analysis
+site_name: "Easy to Explain: Time-Series Features"
+site_url: https://franciscovmacieira.github.io/easyts/
 nav:
     - Home:
         - Overview: index.md 
     - Documentation:
         - Trend Analysis:
             - Trend Strength: features/trend_strength.md
-            - Median Crosses: features/median_crosses.md
             - Trend Changes: features/trend_changes.md
             - Linear Regression: features/linear_regression.md
-        - Noise/Complexity: 
+        - Noise/Volatility: 
             - Series Forecastability: features/forecastability.md
-            - Entropy Pairs: features/entropy_pairs.md
             - Series Fluctuation: features/fluctuation.md
+            - Window Fluctuation: features/window_fluctuation.md
         - Seasonality Detection:
             - Autocorrelation Relevance: features/ac_relevance.md
             - Seasonal Strength: features/seasonal_strength.md
-        - Volatility/Outliers:
-            - Window Fluctuation: features/window_fluctuation.md
         - Model Selection:
             - Short-Term Variation: features/st_variation.md
-            - Autocorrelation: features/ac.md
+            - Differenced Series: features/diff_series.md
             - Series Complexity: features/complexity.md
         - Clustering/Classification:
             - Records Concentration: features/rec_concentration.md
             - Series Centroid: features/centroid.md
-    - API Reference:
-        - Reference: api_reference.md 
     - Changelog:
         - Log: changelog.md 
-    - Code of Conduct:
-        - Conduct: conduct.md 
     - Contributing:
         - Guide: contributing.md 
     - Requirements:

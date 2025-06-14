@@ -11,7 +11,23 @@ if PROJECT_ROOT not in sys.path:
 
 # --- Required Imports ---
 from datasetsforecast.m3 import M3
-from src.metrics import Metrics
+from src.metrics import (
+    trend_strength,
+    trend_changes,
+    linear_regression_slope,
+    linear_regression_r2,
+    forecastability,
+    fluctuation,
+    ac_relevance,
+    seasonal_strength,
+    window_fluctuation,
+    st_variation,
+    diff_series,
+    complexity,
+    rec_concentration,
+    centroid,
+    info
+)
 
 # --- Data Loading Helper ---
 
@@ -70,32 +86,19 @@ def test_trend_strength():
     """Tests the trend_strength metric."""
     series_list = _load_test_series()
 
-    for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.trend_strength()
+    for series in series_list:    
+        result = trend_strength(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert 0.0 <= result <= 1.0, "Trend strength must be between 0 and 1"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_trend_strength passed.")
-
-def test_median_crosses():
-    """Tests the median_crosses metric."""
-    series_list = _load_test_series()
-
-    for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.median_crosses()
-        assert isinstance(result, (int, np.integer)), "Result must be an integer"
-        assert result >= 0, "Median crosses cannot be negative"
-    print("test_median_crosses passed.")
 
 def test_trend_changes():
     """Tests the trend_changes metric."""
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.trend_changes()
+        result = trend_changes(series)
         assert isinstance(result, (int, np.integer)), "Result must be an integer"
         assert result >= 0, "Number of trend changes cannot be negative"
     print("test_trend_changes passed.")
@@ -105,8 +108,7 @@ def test_linear_regression_slope():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.linear_regression_slope()
+        result = linear_regression_slope(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_linear_regression_slope passed.")
@@ -116,8 +118,7 @@ def test_linear_regression_r2():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.linear_regression_r2()
+        result = linear_regression_r2(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert result <= 1.0, "R-squared cannot be greater than 1"
         assert np.isfinite(result), "Result must be a finite number"
@@ -128,31 +129,18 @@ def test_forecastability():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.forecastability(sf=1)
+        result = forecastability(series, sf=1)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert result >= 0, "Forecastability cannot be negative"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_forecastability passed.")
-
-def test_entropy_pairs():
-    """Tests the entropy_pairs metric."""
-    series_list = _load_test_series()
-
-    for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.entropy_pairs()
-        assert isinstance(result, (float, np.floating)), "Result must be a float"
-        assert np.isfinite(result), "Result must be a finite number"
-    print("test_entropy_pairs passed.")
 
 def test_fluctuation():
     """Tests the fluctuation metric."""
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.fluctuation()
+        result = fluctuation(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_fluctuation passed.")
@@ -162,8 +150,7 @@ def test_ac_relevance():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.ac_relevance()
+        result = ac_relevance(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_ac_relevance passed.")
@@ -173,8 +160,7 @@ def test_seasonal_strength():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.seasonal_strength()
+        result = seasonal_strength(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert 0.0 <= result <= 1.0, "Seasonal strength must be between 0 and 1"
         assert np.isfinite(result), "Result must be a finite number"
@@ -185,8 +171,7 @@ def test_window_fluctuation():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.window_fluctuation()
+        result = window_fluctuation(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_window_fluctuation passed.")
@@ -196,31 +181,17 @@ def test_st_variation():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.st_variation()
+        result = st_variation(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_st_variation passed.")
-
-def test_ac():
-    """Tests the ac (autocorrelation) metric."""
-    series_list = _load_test_series()
-
-    for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.ac()
-        assert isinstance(result, (float, np.floating)), "Result must be a float"
-        assert -1.0 <= result <= 1.0, "Autocorrelation must be between -1 and 1"
-        assert np.isfinite(result), "Result must be a finite number"
-    print("test_ac passed.")
 
 def test_diff_series():
     """Tests the diff_series metric."""
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.diff_series()
+        result = diff_series(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert result >= 0, "Sum of squared ACFs cannot be negative"
         assert np.isfinite(result), "Result must be a finite number"
@@ -231,8 +202,7 @@ def test_complexity():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.complexity()
+        result = complexity(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert result >= 0.0, "Complexity cannot be negative"
         assert np.isfinite(result), "Result must be a finite number"
@@ -243,8 +213,7 @@ def test_rec_concentration():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.rec_concentration()
+        result = rec_concentration(series)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert np.isfinite(result), "Result must be a finite number"
     print("test_rec_concentration passed.")
@@ -254,8 +223,7 @@ def test_centroid():
     series_list = _load_test_series()
 
     for series in series_list:
-        metrics = Metrics(series)
-        result = metrics.centroid(fs=12)
+        result = centroid(series, fs=12)
         assert isinstance(result, (float, np.floating)), "Result must be a float"
         assert result >= 0.0, "Centroid cannot be negative"
         assert np.isfinite(result), "Result must be a finite number"
@@ -269,14 +237,12 @@ if __name__ == "__main__":
     
     # Trend Analysis
     test_trend_strength()
-    test_median_crosses()
     test_trend_changes()
     test_linear_regression_slope()
     test_linear_regression_r2()
 
     # Noise/Complexity
     test_forecastability()
-    test_entropy_pairs()
     test_fluctuation()
     test_complexity()
 
@@ -289,7 +255,6 @@ if __name__ == "__main__":
 
     # Model Selection
     test_st_variation()
-    test_ac()
     test_diff_series()
     
     # Clustering/Classification

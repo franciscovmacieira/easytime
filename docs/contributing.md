@@ -8,21 +8,10 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
-### Fix Bugs
-
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
-wanted" is open to whoever wants to implement it.
-
-### Implement Features
-
-Look through the GitHub issues for features. Anything tagged with "enhancement"
-and "help wanted" is open to whoever wants to implement it.
-
 ### Write Documentation
 
 You can never have enough documentation! Please feel free to contribute to any
-part of the documentation, such as the official docs, docstrings, or even
-on the web in blog posts, articles, and such.
+part of the documentation, such as the official website or the GitHub repository.
 
 ### Submit Feedback
 
@@ -35,26 +24,80 @@ If you are proposing a feature:
 
 ## Get Started!
 
-Ready to contribute? Here's how to set up `EasyTest` for local development.
+Ready to contribute to `easyts`? Here's how to set up your local development environment.
 
-1. Download a copy of `EasyTest` locally.
-2. Install `EasyTest` using `poetry`:
+### 1. Fork and Clone the Repository
 
-    ```console
-    $ poetry install
-    ```
+First, navigate to the `easyts` GitHub repository and click the "**Fork**" button in the top-right corner. This creates your own copy of the project.
 
-3. Use `git` (or similar) to create a branch for local development and make your changes:
+Next, clone your forked repository to your local machine. Replace `[Your-GitHub-Username]` with your actual username.
 
-    ```console
-    $ git checkout -b name-of-your-bugfix-or-feature
-    ```
+```console
+git clone [https://github.com/](https://github.com/)[Your-GitHub-Username]/easyts.git
+cd easyts
+```
 
-4. When you're done making changes, check that your changes conform to any code formatting requirements and pass any tests.
+### 2. Create and Activate a Virtual Environment
 
-5. Commit your changes and open a pull request.
+It's highly recommended to work in a virtual environment. This keeps your project's dependencies isolated.
 
-## Pull Request Guidelines
+```console
+# Create the virtual environment
+python -m venv venv
+
+# Activate it (macOS/Linux)
+source venv/bin/activate
+
+# Or activate it (Windows)
+venv\Scripts\activate
+```
+
+### 3. Install Dependencies in Editable Mode
+
+Install the required packages from the `requirements.txt` file. Then, install `easyts` itself in "editable" mode (`-e .`) so your code changes take effect immediately.
+
+```console
+# Install dependencies
+pip install -r requirements.txt
+
+# Install the project in editable mode
+pip install -e .
+```
+*(Note: If you don't have a `requirements.txt` file, you can create one in your project with `pip freeze > requirements.txt` after installing all necessary packages.)*
+
+### 4. Create a New Branch
+
+Create a dedicated branch for your changes. Choose a descriptive name.
+
+```console
+git checkout -b name-of-your-bugfix-or-feature
+```
+
+### 5. Make Your Changes and Run Checks
+
+Now, you can modify the code. When you're done, run the project's tests and code formatters to ensure everything is correct.
+
+```console
+# Example: Run tests (if you're using pytest)
+pytest
+
+# Example: Format your code (if you're using Black)
+black .
+```
+
+### 6. Commit Your Changes and Push to Your Fork
+
+Commit your work with a clear message and push the branch to your forked repository on GitHub.
+
+```console
+git add .
+git commit -m "A clear and descriptive commit message"
+git push origin name-of-your-bugfix-or-feature
+```
+
+### 7. Open a Pull Request
+
+Finally, go to your fork on GitHub. You should see a prompt to "**Compare & pull request**". Click it, review your changes, and submit the pull request to the main `easyts` repository.
 
 Before you submit a pull request, check that it meets these guidelines:
 

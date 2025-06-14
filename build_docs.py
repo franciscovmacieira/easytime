@@ -5,7 +5,7 @@ import nbformat
 from copy import deepcopy
 from nbconvert.preprocessors import TagRemovePreprocessor, ExecutePreprocessor
 import traceback
-import re # For replacing filenames in markdown
+import re 
 
 import asyncio
 if sys.platform == 'win32':
@@ -22,17 +22,15 @@ notebook_in_path = 'docs/notebook.ipynb'
 output_base_dir = 'docs'
 build_tasks = {
     'features/trend_strength.md': ['trend_strength'],
-    'features/median_crosses.md': ['median_crosses'],
     'features/trend_changes.md': ['trend_changes'],
     'features/linear_regression.md': ['linear_regression'],
     'features/forecastability.md': ['forecastability'],
-    'features/entropy_pairs.md': ['entropy_pairs'],
     'features/fluctuation.md': ['fluctuation'],
     'features/ac_relevance.md': ['ac_relevance'],
     'features/seasonal_strength.md': ['seasonal_strength'],
     'features/window_fluctuation.md': ['window_fluctuation'],
     'features/st_variation.md': ['st_variation'],
-    'features/ac.md': ['ac'],
+    'features/diff_series.md': ['diff_series'],
     'features/complexity.md': ['complexity'],
     'features/rec_concentration.md': ['rec_concentration'],
     'features/centroid.md': ['centroid']
@@ -53,7 +51,7 @@ except Exception as e:
      print(f"ERROR determining notebook path: {e}")
      sys.exit(1)
 
-# --- Preprocessor Setup (outside the loop) ---
+# --- Preprocessor Setup ---
 remover = TagRemovePreprocessor(
     remove_input_tags=[input_removal_tag],
     remove_all_outputs_tags=[output_removal_tag]
@@ -69,16 +67,13 @@ fail_count = 0
 for rel_out_path, tags_to_keep in build_tasks.items():
     print(f"\nProcessing for output '{rel_out_path}' with target tags {tags_to_keep}...")
 
-    # --- CORRECTED resource_prefix calculation ---
-    # Get the base filename without extension (e.g., "trend_strength")
     md_filename_base = os.path.basename(rel_out_path).replace('.md', '')
-    resource_prefix = md_filename_base # Use this simple prefix
-    # --- END CORRECTION ---
+    resource_prefix = md_filename_base 
 
-    notebook_to_process = None # Will hold the notebook node for this iteration
+    notebook_to_process = None
 
     try:
-        # --- 1. LOAD Notebook for EACH task ---
+        # --- 1. LOAD Notebook  --
         print(f"  Loading notebook: {notebook_in_path}")
         with open(notebook_in_path, 'r', encoding='utf-8') as f:
             original_notebook = nbformat.read(f, as_version=4)
@@ -121,50 +116,43 @@ for rel_out_path, tags_to_keep in build_tasks.items():
         (output, resources) = md_exporter.from_notebook_node(notebook_final_for_conversion)
         print(f"  Conversion successful.")
 
-        # --- 6. PROCESS & WRITE resources (images) with RENAMING ---
-        output_modified = output # Start with original markdown output
+        # --- 6. PROCESS & WRITE resources ---
+        output_modified = output 
         if 'outputs' in resources and resources['outputs']:
             print(f"  -> Found {len(resources['outputs'])} output resource(s). Processing...")
-            # Determine output directory for this markdown file
             full_out_path = os.path.join(output_base_dir, rel_out_path)
             out_dir = os.path.dirname(full_out_path)
             os.makedirs(out_dir, exist_ok=True) # Ensure dir exists
 
             for original_filename, file_data in resources['outputs'].items():
-                # Get the base of the auto-generated filename (e.g., output_5_0.png)
                 original_basename = os.path.basename(original_filename)
 
-                # Create a new unique filename using the CORRECTED prefix
-                # e.g., trend_strength_output_5_0.png
-                new_safe_filename = f"{resource_prefix}_{original_basename}" # Uses simple prefix now
-                img_write_path = os.path.join(out_dir, new_safe_filename) # This path should now be correct
+                new_safe_filename = f"{resource_prefix}_{original_basename}" 
+                img_write_path = os.path.join(out_dir, new_safe_filename)
 
                 print(f"    Renaming resource '{original_basename}' -> '{new_safe_filename}'")
 
-                # Write the image data to the NEW path
                 try:
                     with open(img_write_path, 'wb') as img_f:
                         img_f.write(file_data)
-                    # print(f"     + Wrote renamed resource: {img_write_path}") # Less verbose
                 except Exception as img_e:
                     print(f"     ! ERROR writing renamed resource {new_safe_filename} to {out_dir}: {img_e}")
-                    continue # Skip replacing link if write failed
+                    continue 
 
-                # --- Replace the link in the Markdown output ---
                 pattern = re.compile(r'(!\[.*?\]\()([^)]*?/)?' + re.escape(original_basename) + r'(\))')
-                replacement = r'\1' + new_safe_filename + r'\3' # Group 1=![alt](, Group 3=)
+                replacement = r'\1' + new_safe_filename + r'\3' 
                 output_modified_new, num_replacements = pattern.subn(replacement, output_modified)
 
                 if num_replacements > 0:
                      print(f"      Replaced {num_replacements} link(s) in Markdown for '{original_basename}' with '{new_safe_filename}'.")
-                     output_modified = output_modified_new # Update the output string
+                     output_modified = output_modified_new 
                 else:
                      print(f"      WARNING: Could not find link for '{original_basename}' in Markdown output to replace. Image saved but might not be linked correctly.")
 
 
         # --- 7. WRITE final modified output ---
         with open(full_out_path, 'w', encoding='utf-8') as f:
-            f.write(output_modified) # Write the potentially modified output
+            f.write(output_modified) 
         print(f"  -> Successfully wrote {full_out_path}")
 
         success_count += 1

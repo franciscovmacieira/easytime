@@ -1,27 +1,14 @@
-* Requirements
+# Requirements
 
-** Core Dependencies
+## Core Dependencies
 The following packages are required to run EasyTest:
 
-- numpy>=1.23.5
+- numpy~=1.26.4
+- antropy~=0.1.9
+- pycatch22~=0.4.5
+- tsfel~=0.1.9
+- tsfeatures~=0.4.5
+- statsmodels~=0.14.4 
+- ruptures~=1.1.9
+- scikit-learn~=1.6.1
 
-- pandas>=2.2.1
-
-- statsmodels>=0.14.0
-
-- scikit-learn>=1.2.0
-
-- ruptures
-
-- matplotlib
-
-** Development Dependencies
-The following packages are required for development, testing, and linting:
-
-- pytest>=7.1
-
-- black>=23.10
-
-- flake8>=6.1
-
-- mypy>=1.0

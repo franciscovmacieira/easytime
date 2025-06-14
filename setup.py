@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='dtsanalysis',
+    name='easyts',
     version='0.1.0',
-    packages=find_packages(),
+    packages=find_packages(where='src'),
     install_requires=[
         'numpy~=1.26.4',
         'antropy~=0.1.9',

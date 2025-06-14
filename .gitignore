@@ -120,6 +120,16 @@ venv.bak/
 # mkdocs documentation
 site/ # This will ignore the 'site' directory and all its contents
 
+# others
+build/
+easyts.egg-info/
+docs/
+build_docs.py
+build_utils.py
+mkdocs.yml
+mkdocs_prompts.txt
+
+
 # mypy
 .mypy_cache/
 .dmypy.json

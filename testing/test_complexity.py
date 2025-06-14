@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datasetsforecast.m3 import M3
-from src.metrics import Metrics
+from src.metrics import complexity
 import sys
 import os
 import random
@@ -79,12 +79,10 @@ def test_complexity_analysis():
             print(f"Series {id2} is too short ({len(series2_np)} points). Skipping.")
             continue
 
-        metrics_s1 = Metrics(series1_np)
-        complexity_s1 = metrics_s1.complexity()
+        complexity_s1 = complexity(series1_np)
         print(f"Complexity for {id1}: {complexity_s1:.4f}")
 
-        metrics_s2 = Metrics(series2_np)
-        complexity_s2 = metrics_s2.complexity()
+        complexity_s2 = complexity(series2_np)
         print(f"Complexity for {id2}: {complexity_s2:.4f}")
         
         concatenated_series_np = np.concatenate([series1_np, series2_np])
@@ -97,8 +95,7 @@ def test_complexity_analysis():
             print(f"Concatenated series {series_pair_id} is too short ({len(concatenated_series_np)} points) for complexity calculation. Skipping complexity for concatenated.")
             complexity_concat = np.nan
         else:
-            metrics_instance_concat = Metrics(concatenated_series_np)
-            complexity_concat = metrics_instance_concat.complexity()
+            complexity_concat = complexity(concatenated_series_np)
             print(f"Complexity for concatenated series {series_pair_id}: {complexity_concat:.4f}")
 
         current_features = {
@@ -155,7 +152,7 @@ if __name__ == "__main__":
         print("Metrics DataFrame for series complexities was generated.")
         
         # --- Save results DataFrame as an image ---
-        table_image_output_path = os.path.join(PROJECT_ROOT, "series_complexity_results_table.png")
+        table_image_output_path = os.path.join(PROJECT_ROOT, "examples + more info", "series_complexity_results_table.png")
         
         cols_for_image_display = [
             "unique_id_pair", "ID1", "Length1", "Complexity_S1", 

@@ -1,10 +1,33 @@
-# Index
+# Welcome to "Easy to Explain: Time-Series Features"
 
-## Purpose
-The purpose of this repository is to create a python library to help developers dealing with time-series analysis.
+This Python library offers diverse solution for advanced time-series analysis. This library is built to empower developers and data scientists by simplifying complex time-series tasks.
 
-## Project
-This library will include several features to deal with different scenarios of time-series analysis: Trend Analysis, Seasonality Detection, Noise, Outliers, Model Selection and Classification.
+---
+
+## What It Does
+
+`easyts` equips you with a robust set of features to master your time-series data:
+
+* 📈 **Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
+
+* ⚡️ **Noise & Volatility Modeling:** Characterize the randomness, complexity, and predictability of your time-series.
+
+* 🌊 **Seasonality Detection:** Identify and measure the strength of recurring, cyclical patterns.
+
+* 🤖 **Model Selection:** Extract key statistical properties to guide your choice of forecasting models.
+
+* 🔍 **Clustering & Classification:** Generate unique fingerprints for your time-series to use in machine learning tasks.
+
+---
+
+## Installation
+
+Get started in seconds.
+
+```bash
+pip install easyts 
+```
 
 ## Context
-This is part of an investigation project executed by FCUP student Francisco Macieira in the context of his Artificial Intelligence and Data Science bachelor, with the help of FCUP and FEUP professor Moisés Santos.
+
+This library was developed as the focus of a research initiative by Francisco Macieira, an undergraduate student of Artificial Intelligence and Data Science at FCUP. The project was supervised by Professor Moisés Santos, affiliated with both FCUP and FEUP.
