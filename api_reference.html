@@ -22,7 +22,7 @@
     
     
       
-        <title>Reference Guide - Easy to Explain: Time-Series Features</title>
+        <title>Usage Guide - Easy to Explain: Time-Series Features</title>
       
     
     
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Reference Guide
+              Usage Guide
             
           </span>
         </div>
@@ -910,7 +910,7 @@
   
   
   <span class="md-ellipsis">
-    Reference Guide
+    Usage Guide
     
   </span>
   
@@ -923,7 +923,7 @@
   
   
   <span class="md-ellipsis">
-    Reference Guide
+    Usage Guide
     
   </span>
   
@@ -992,16 +992,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trend-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      Trend Analysis
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Trend Analysis">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#trend_strengthseries-period1-seasonal7-robustfalse" class="md-nav__link">
     <span class="md-ellipsis">
       trend_strength(series, period=1, seasonal=7, robust=False)
@@ -1037,21 +1027,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#noisevolatility" class="md-nav__link">
-    <span class="md-ellipsis">
-      Noise/Volatility
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Noise/Volatility">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#forecastabilityseries-sf-methodwelch-npersegnone-normalizefalse" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1079,21 +1054,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#seasonality-detection" class="md-nav__link">
-    <span class="md-ellipsis">
-      Seasonality Detection
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Seasonality Detection">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#seasonal_strengthseries-period1-seasonal7-robustfalse" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1111,21 +1071,6 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#model-selection" class="md-nav__link">
-    <span class="md-ellipsis">
-      Model Selection
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Model Selection">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#st_variationseries" class="md-nav__link">
@@ -1154,21 +1099,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#clustering-and-classification" class="md-nav__link">
-    <span class="md-ellipsis">
-      Clustering and Classification
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Clustering and Classification">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#rec_concentrationseries" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1187,32 +1117,12 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#information" class="md-nav__link">
-    <span class="md-ellipsis">
-      Information
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Information">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#info" class="md-nav__link">
     <span class="md-ellipsis">
       info()
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1489,150 +1399,81 @@
 * <code>TypeError</code>: Raised when a function receives an argument of the wrong type (e.g., a list where a NumPy array is expected).</p>
 <hr />
 <h2 id="functions-reference">Functions Reference</h2>
-<h3 id="trend-analysis">Trend Analysis</h3>
-<p>Functions to quantify the direction, strength, and stability of a trend.</p>
-<h4 id="trend_strengthseries-period1-seasonal7-robustfalse"><code>trend_strength(series, period=1, seasonal=7, robust=False)</code></h4>
-<p>Uses STL decomposition to measure how dominant the trend component is compared to the remainder.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-    - <code>period</code> (int, optional): The seasonal period of the series. Defaults to 1.
-    - <code>seasonal</code> (int, optional): The length of the seasonal smoother. Must be odd. Defaults to 7.
-    - <code>robust</code> (bool, optional): If <code>True</code>, the decomposition is more resistant to outliers. Defaults to <code>False</code>.
-- <strong>Returns:</strong> (<code>float</code>) A value between 0.0 (no trend) and 1.0 (strongest trend).
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">strength</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">trend_strength</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="trend_changesseries-modell2-min_size2-jump5-paramsnone-custom_costnone"><code>trend_changes(series, model="l2", min_size=2, jump=5, params=None, custom_cost=None)</code></h4>
-<p>Detects the number of abrupt change points in a series using the Pelt algorithm.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-    - <code>model</code> (str, optional): The cost model for the change point detection. Defaults to "l2".
-    - <code>jump</code> (int, optional): Subsample window for considering change points. Defaults to 2.
-    - <code>params</code> (dict or None, optional): Additional parameters dictionary for the cost 'model'. Defaults to None.
-    - <code>custom_cost</code> (BaseCost or None, optional): Custom cost function (overrides 'model'). Defaults to None.
-- <strong>Returns:</strong> (<code>int</code>) The number of detected trend change points.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">changes</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">trend_changes</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="linear_regression_slopeseries"><code>linear_regression_slope(series)</code></h4>
-<p>Fits a linear regression to the series and returns its slope.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The slope of the fitted line, indicating direction and steepness.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">slope</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">linear_regression_slope</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="linear_regression_r2series"><code>linear_regression_r2(series)</code></h4>
-<p>Fits a linear regression and returns its R-squared value, indicating goodness of fit.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The R-squared value, between 0.0 and 1.0.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">r2_score</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">linear_regression_r2</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="noisevolatility">Noise/Volatility</h3>
-<p>Functions to characterize the randomness, complexity, and predictability of a series.</p>
-<h4 id="forecastabilityseries-sf-methodwelch-npersegnone-normalizefalse"><code>forecastability(series, sf, method="welch", nperseg=None, normalize=False)</code></h4>
-<p>Calculates the spectral entropy, a measure of the series' forecastability. Lower entropy means higher forecastability.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-    - <code>sf</code> (float, mandatory): The sampling frequency of the series. Defaults to 1.0.
-    - <code>nperseg</code> (int or None, optional): Segment length for welch method. If None, default based on data length.
-    - <code>normalize</code> (bool, optional): Normalize output to [0, 1]. Defaults to False.
-- <strong>Returns:</strong> (<code>float</code>) The spectral entropy of the series.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">entropy</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">forecastability</span><span class="p">(</span><span class="n">my_series</span><span class="p">,</span> <span class="n">sf</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="fluctuationseries"><code>fluctuation(series)</code></h4>
-<p>Measures variability between consecutive data points to quantify local smoothness.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The fluctuation value.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">fluc</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">fluctuation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="window_fluctuationseries"><code>window_fluctuation(series)</code></h4>
-<p>Assesses self-similar fluctuations across different time scales.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The window fluctuation value.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">win_fluc</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">window_fluctuation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="seasonality-detection">Seasonality Detection</h3>
-<p>Functions to identify and measure the strength of recurring patterns.</p>
-<h4 id="seasonal_strengthseries-period1-seasonal7-robustfalse"><code>seasonal_strength(series, period=1, seasonal=7, robust=False)</code></h4>
-<p>Uses STL decomposition to measure how dominant the seasonal component is.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-    - <code>period</code> (int, optional): The seasonal period. Defaults to 1.
-    - <code>seasonal</code> (int, optional): Length of the seasonal smoother. Must be odd. Defaults to 7.
-    - <code>robust</code> (bool, optional): If <code>True</code>, the decomposition is more resistant to outliers. Defaults to <code>False</code>.
-- <strong>Returns:</strong> (<code>float</code>) A value between 0.0 (no seasonality) and 1.0 (strongest seasonality).
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">season_str</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">seasonal_strength</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="ac_relevanceseries"><code>ac_relevance(series)</code></h4>
-<p>Finds the first zero-crossing of the autocorrelation function, indicating how quickly the series "memory" decays.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The lag of the first autocorrelation zero-crossing.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">relevance</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">ac_relevance</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="model-selection">Model Selection</h3>
-<p>Functions to extract statistical properties to guide forecasting model choice.</p>
-<h4 id="st_variationseries"><code>st_variation(series)</code></h4>
-<p>Measures the amount of high-frequency, short-term variation in the data.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The short-term variation value.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">variation</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">st_variation</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="diff_seriesseries"><code>diff_series(series)</code></h4>
-<p>Calculates the sum of squared autocorrelations for the first-differenced series. Useful for ARIMA model parameterization.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The autocorrelation feature of the differenced series.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">diff_acf</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">diff_series</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="complexityseries"><code>complexity(series)</code></h4>
-<p>Calculates the Complexity Estimate, a measure of how "wiggly" or complex a series is.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The complexity estimate value.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">comp</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">complexity</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="clustering-and-classification">Clustering and Classification</h3>
-<p>Functions to generate unique fingerprints for time-series to use in machine learning tasks.</p>
-<h4 id="rec_concentrationseries"><code>rec_concentration(series)</code></h4>
-<p>Creates a histogram to find where the series values are most concentrated.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-- <strong>Returns:</strong> (<code>float</code>) The mode of the 10-bin histogram of the series.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">concentration</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">rec_concentration</span><span class="p">(</span><span class="n">my_series</span><span class="p">)</span>
-</code></pre></div></p>
-<h4 id="centroidseries-fs1"><code>centroid(series, fs=1)</code></h4>
-<p>Computes the spectral centroid, or the "center of mass" of the series' frequency spectrum.
-- <strong>Parameters:</strong>
-    - <code>series</code> (numpy.ndarray): The 1D time-series data.
-    - <code>fs</code> (int, mandatory): The sampling frequency.
-- <strong>Returns:</strong> (<code>float</code>) The spectral centroid value.
-- <strong>Example:</strong>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">spec_centroid</span> <span class="o">=</span> <span class="n">easyts</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">my_series</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="information">Information</h3>
-<h4 id="info"><code>info()</code></h4>
-<p>A static method that prints a brief description of all available features to the console.
-- <strong>Parameters:</strong> None.
-- <strong>Returns:</strong> None. Prints to standard output.
-- <strong>Example:</strong>
-    ```python
-    easyts.info()</p>
+<h4 id="trend_strengthseries-period1-seasonal7-robustfalse">trend_strength(series, period=1, seasonal=7, robust=False)</h4>
+<div class="highlight"><pre><span></span><code>```python
+strength = easyts.trend_strength(my_series)
+```
+</code></pre></div>
+<h4 id="trend_changesseries-modell2-min_size2-jump5-paramsnone-custom_costnone">trend_changes(series, model="l2", min_size=2, jump=5, params=None, custom_cost=None)</h4>
+<div class="highlight"><pre><span></span><code>```python
+changes = easyts.trend_changes(my_series)
+```
+</code></pre></div>
+<h4 id="linear_regression_slopeseries">linear_regression_slope(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+slope = easyts.linear_regression_slope(my_series)
+```
+</code></pre></div>
+<h4 id="linear_regression_r2series">linear_regression_r2(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+r2_score = easyts.linear_regression_r2(my_series)
+```
+</code></pre></div>
+<h4 id="forecastabilityseries-sf-methodwelch-npersegnone-normalizefalse">forecastability(series, sf, method="welch", nperseg=None, normalize=False)</h4>
+<div class="highlight"><pre><span></span><code>```python
+entropy = easyts.forecastability(my_series, sf=1.0)
+```
+</code></pre></div>
+<h4 id="fluctuationseries">fluctuation(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+fluc = easyts.fluctuation(my_series)
+```
+</code></pre></div>
+<h4 id="window_fluctuationseries">window_fluctuation(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+win_fluc = easyts.window_fluctuation(my_series)
+```
+</code></pre></div>
+<h4 id="seasonal_strengthseries-period1-seasonal7-robustfalse">seasonal_strength(series, period=1, seasonal=7, robust=False)</h4>
+<div class="highlight"><pre><span></span><code>```python
+season_str = easyts.seasonal_strength(my_series)
+```
+</code></pre></div>
+<h4 id="ac_relevanceseries">ac_relevance(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+relevance = easyts.ac_relevance(my_series)
+```
+</code></pre></div>
+<h4 id="st_variationseries">st_variation(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+variation = easyts.st_variation(my_series)
+```
+</code></pre></div>
+<h4 id="diff_seriesseries">diff_series(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+diff_acf = easyts.diff_series(my_series)
+```
+</code></pre></div>
+<h4 id="complexityseries">complexity(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+comp = easyts.complexity(my_series)
+```
+</code></pre></div>
+<h4 id="rec_concentrationseries">rec_concentration(series)</h4>
+<div class="highlight"><pre><span></span><code>```python
+concentration = easyts.rec_concentration(my_series)
+```
+</code></pre></div>
+<h4 id="centroidseries-fs1">centroid(series, fs=1)</h4>
+<div class="highlight"><pre><span></span><code>```python
+spec_centroid = easyts.centroid(my_series, fs=1)
+```
+</code></pre></div>
+<h4 id="info">info()</h4>
+<div class="highlight"><pre><span></span><code>```python
+easyts.info()
+```
+</code></pre></div>
 
 
 
