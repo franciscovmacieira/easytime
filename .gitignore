@@ -120,16 +120,6 @@ venv.bak/
 # mkdocs documentation
 site/ # This will ignore the 'site' directory and all its contents
 
-# others
-build/
-easyts.egg-info/
-docs/
-build_docs.py
-build_utils.py
-mkdocs.yml
-mkdocs_prompts.txt
-
-
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -157,5 +147,6 @@ dmypy.json
 .DS_Store
 
 # Custom Ignores
-mkdocs_prompts # This will ignore the file named 'mkdocs_prompts' at any level
+easyts.egg-info/
+mkdocs_prompts.txt
 

@@ -1,0 +1,56 @@
+site_name: "Easy to Explain: Time-Series Features"
+site_url: https://franciscovmacieira.github.io/easyts/
+nav:
+    - Home:
+        - Overview: index.md 
+    - Documentation:
+        - Trend Analysis:
+            - Trend Strength: features/trend_strength.md
+            - Trend Changes: features/trend_changes.md
+            - Linear Regression: features/linear_regression.md
+        - Noise/Volatility: 
+            - Series Forecastability: features/forecastability.md
+            - Series Fluctuation: features/fluctuation.md
+            - Window Fluctuation: features/window_fluctuation.md
+        - Seasonality Detection:
+            - Autocorrelation Relevance: features/ac_relevance.md
+            - Seasonal Strength: features/seasonal_strength.md
+        - Model Selection:
+            - Short-Term Variation: features/st_variation.md
+            - Differenced Series: features/diff_series.md
+            - Series Complexity: features/complexity.md
+        - Clustering/Classification:
+            - Records Concentration: features/rec_concentration.md
+            - Series Centroid: features/centroid.md
+    - API Reference:
+        - Usage Guide: api_reference.md 
+    - Changelog:
+        - Log: changelog.md 
+    - Contributing:
+        - Guide: contributing.md 
+    - Requirements:
+        - List: requirements.md
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - toc.integrate
+
+docs_dir: docs
+use_directory_urls: false
+
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_css:
+ - stylesheets/custom.css
