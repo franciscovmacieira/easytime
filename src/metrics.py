@@ -97,34 +97,6 @@ def diff_series(series): # Differenced Series
     diff = result_dict['diff1_acf10']
     return diff
 
-# --- Helper Functions for Series Complexity Feature ---
-
-def z_normalize(ts: np.ndarray) -> np.ndarray: # Z-Normalization
-    """
-    Z-normalizes a time series.
-    A constant series will be normalized to a series of zeros.
-    """
-    mean_ts = np.mean(ts)
-    std_ts = np.std(ts)
-    if std_ts == 0:
-        return np.zeros_like(ts, dtype=np.float64)
-    return (ts - mean_ts) / std_ts
-
-def calculate_raw_ce(ts_normalized: np.ndarray) -> float: # Complexity Estimate
-    """
-    Calculates the Complexity Estimate (CE) for a z-normalized time series.
-    CE(Q) = sqrt(sum_{i=1}^{n-1} (q_i - q_{i+1})^2)
-    """
-    if len(ts_normalized) < 2:
-        return 0.0 
-    
-    diff_ts = np.diff(ts_normalized) 
-    ce = np.sqrt(np.sum(diff_ts**2))
-    return ce
-
-#--------------------------------------------------
-
-
 def complexity(series) -> float: # Series Complexity
     """
     Calculates the Complexity Estimate (CE) for the time series.
@@ -143,12 +115,19 @@ def complexity(series) -> float: # Series Complexity
         )
 
     # 1. Z-normalize the series
-    normalized_series = z_normalize(series_np)
+    mean_ts = np.mean(series_np)
+    std_ts = np.std(series_np)
+    if std_ts == 0:
+        series_np = np.zeros_like(series_np, dtype=np.float64)
+    series_np = (series_np - mean_ts) / std_ts
 
     # 2. Calculate Complexity Estimate (CE)
-    complexity_estimate = calculate_raw_ce(normalized_series)
-    
-    return complexity_estimate
+    if len(series_np) < 2:
+        return 0.0 
+    diff_ts = np.diff(series_np) 
+    ce = np.sqrt(np.sum(diff_ts**2))
+
+    return ce
 
 # Clustering/Classification
 
