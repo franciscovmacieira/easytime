@@ -10,15 +10,15 @@ To acess the full documentation, visit our official website: https://franciscovm
 
 `easyts` equips you with a robust set of features to master your time-series data:
 
-* 📈 **Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
+**Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
 
-* ⚡️ **Noise & Volatility Modeling:** Characterize the randomness, complexity, and predictability of your time-series.
+**Noise & Volatility Modeling:** Characterize the randomness, complexity, and predictability of your time-series.
 
-* 🌊 **Seasonality Detection:** Identify and measure the strength of recurring, cyclical patterns.
+**Seasonality Detection:** Identify and measure the strength of recurring, cyclical patterns.
 
-* 🤖 **Model Selection:** Extract key statistical properties to guide your choice of forecasting models.
+**Model Selection:** Extract key statistical properties to guide your choice of forecasting models.
 
-* 🔍 **Clustering & Classification:** Generate unique fingerprints for your time-series to use in machine learning tasks.
+**Clustering & Classification:** Generate unique fingerprints for your time-series to use in machine learning tasks.
 
 ---
 
