@@ -14,7 +14,7 @@ Detects the number of points where the trend changes.
 
 
 <style type="text/css">
-#T_9074c th {
+#T_4ed31 th {
   background-color: #f2f2f2;
   color: black;
   font-weight: bold;
@@ -22,7 +22,7 @@ Detects the number of points where the trend changes.
   border: 1px solid #ddd;
   padding: 5px;
 }
-#T_9074c_row0_col0, #T_9074c_row1_col0, #T_9074c_row2_col0, #T_9074c_row3_col0, #T_9074c_row4_col0 {
+#T_4ed31_row0_col0, #T_4ed31_row1_col0, #T_4ed31_row2_col0, #T_4ed31_row3_col0, #T_4ed31_row4_col0 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -30,14 +30,14 @@ Detects the number of points where the trend changes.
   min-width: 100px;
   font-weight: bold;
 }
-#T_9074c_row0_col1, #T_9074c_row1_col1, #T_9074c_row2_col1, #T_9074c_row3_col1, #T_9074c_row4_col1 {
+#T_4ed31_row0_col1, #T_4ed31_row1_col1, #T_4ed31_row2_col1, #T_4ed31_row3_col1, #T_4ed31_row4_col1 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
   padding: 5px;
   min-width: 60px;
 }
-#T_9074c_row0_col2, #T_9074c_row1_col2, #T_9074c_row2_col2, #T_9074c_row3_col2, #T_9074c_row4_col2 {
+#T_4ed31_row0_col2, #T_4ed31_row1_col2, #T_4ed31_row2_col2, #T_4ed31_row3_col2, #T_4ed31_row4_col2 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -46,7 +46,7 @@ Detects the number of points where the trend changes.
   white-space: normal;
   word-wrap: break-word;
 }
-#T_9074c_row0_col3, #T_9074c_row1_col3, #T_9074c_row2_col3, #T_9074c_row3_col3, #T_9074c_row4_col3 {
+#T_4ed31_row0_col3, #T_4ed31_row1_col3, #T_4ed31_row2_col3, #T_4ed31_row3_col3, #T_4ed31_row4_col3 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -57,45 +57,45 @@ Detects the number of points where the trend changes.
   word-wrap: break-word;
 }
 </style>
-<table id="T_9074c">
+<table id="T_4ed31">
   <thead>
     <tr>
-      <th id="T_9074c_level0_col0" class="col_heading level0 col0" >Parameter</th>
-      <th id="T_9074c_level0_col1" class="col_heading level0 col1" >Type</th>
-      <th id="T_9074c_level0_col2" class="col_heading level0 col2" >Default</th>
-      <th id="T_9074c_level0_col3" class="col_heading level0 col3" >Description</th>
+      <th id="T_4ed31_level0_col0" class="col_heading level0 col0" >Parameter</th>
+      <th id="T_4ed31_level0_col1" class="col_heading level0 col1" >Type</th>
+      <th id="T_4ed31_level0_col2" class="col_heading level0 col2" >Default</th>
+      <th id="T_4ed31_level0_col3" class="col_heading level0 col3" >Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_9074c_row0_col0" class="data row0 col0" >model</td>
-      <td id="T_9074c_row0_col1" class="data row0 col1" >str</td>
-      <td id="T_9074c_row0_col2" class="data row0 col2" >'l2'</td>
-      <td id="T_9074c_row0_col3" class="data row0 col3" >Cost function model (e.g., 'l1', 'l2', 'rbf')</td>
+      <td id="T_4ed31_row0_col0" class="data row0 col0" >model</td>
+      <td id="T_4ed31_row0_col1" class="data row0 col1" >str</td>
+      <td id="T_4ed31_row0_col2" class="data row0 col2" >'l2'</td>
+      <td id="T_4ed31_row0_col3" class="data row0 col3" >Cost function model (e.g., 'l1', 'l2', 'rbf')</td>
     </tr>
     <tr>
-      <td id="T_9074c_row1_col0" class="data row1 col0" >min_size</td>
-      <td id="T_9074c_row1_col1" class="data row1 col1" >int</td>
-      <td id="T_9074c_row1_col2" class="data row1 col2" >2</td>
-      <td id="T_9074c_row1_col3" class="data row1 col3" >Minimum number of samples in a segment.</td>
+      <td id="T_4ed31_row1_col0" class="data row1 col0" >min_size</td>
+      <td id="T_4ed31_row1_col1" class="data row1 col1" >int</td>
+      <td id="T_4ed31_row1_col2" class="data row1 col2" >2</td>
+      <td id="T_4ed31_row1_col3" class="data row1 col3" >Minimum number of samples in a segment.</td>
     </tr>
     <tr>
-      <td id="T_9074c_row2_col0" class="data row2 col0" >jump</td>
-      <td id="T_9074c_row2_col1" class="data row2 col1" >int</td>
-      <td id="T_9074c_row2_col2" class="data row2 col2" >5</td>
-      <td id="T_9074c_row2_col3" class="data row2 col3" >Subsample window for considering change points.</td>
+      <td id="T_4ed31_row2_col0" class="data row2 col0" >jump</td>
+      <td id="T_4ed31_row2_col1" class="data row2 col1" >int</td>
+      <td id="T_4ed31_row2_col2" class="data row2 col2" >5</td>
+      <td id="T_4ed31_row2_col3" class="data row2 col3" >Subsample window for considering change points.</td>
     </tr>
     <tr>
-      <td id="T_9074c_row3_col0" class="data row3 col0" >params</td>
-      <td id="T_9074c_row3_col1" class="data row3 col1" >dict or None</td>
-      <td id="T_9074c_row3_col2" class="data row3 col2" >None</td>
-      <td id="T_9074c_row3_col3" class="data row3 col3" >Additional parameters dictionary for the cost 'model'.</td>
+      <td id="T_4ed31_row3_col0" class="data row3 col0" >params</td>
+      <td id="T_4ed31_row3_col1" class="data row3 col1" >dict or None</td>
+      <td id="T_4ed31_row3_col2" class="data row3 col2" >None</td>
+      <td id="T_4ed31_row3_col3" class="data row3 col3" >Additional parameters dictionary for the cost 'model'.</td>
     </tr>
     <tr>
-      <td id="T_9074c_row4_col0" class="data row4 col0" >custom_cost</td>
-      <td id="T_9074c_row4_col1" class="data row4 col1" >BaseCost or None</td>
-      <td id="T_9074c_row4_col2" class="data row4 col2" >None</td>
-      <td id="T_9074c_row4_col3" class="data row4 col3" >Custom cost function (overrides 'model').</td>
+      <td id="T_4ed31_row4_col0" class="data row4 col0" >custom_cost</td>
+      <td id="T_4ed31_row4_col1" class="data row4 col1" >BaseCost or None</td>
+      <td id="T_4ed31_row4_col2" class="data row4 col2" >None</td>
+      <td id="T_4ed31_row4_col3" class="data row4 col3" >Custom cost function (overrides 'model').</td>
     </tr>
   </tbody>
 </table>

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datasetsforecast.m3 import M3
-from src.metrics import complexity
+from easytime import complexity
 import sys
 import os
 import random

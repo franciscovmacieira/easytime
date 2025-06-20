@@ -13,7 +13,7 @@ Computes the centroid along the time axis.
 
 
 <style type="text/css">
-#T_09544 th {
+#T_891f1 th {
   background-color: #f2f2f2;
   color: black;
   font-weight: bold;
@@ -21,7 +21,7 @@ Computes the centroid along the time axis.
   border: 1px solid #ddd;
   padding: 5px;
 }
-#T_09544_row0_col0 {
+#T_891f1_row0_col0 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -29,14 +29,14 @@ Computes the centroid along the time axis.
   min-width: 100px;
   font-weight: bold;
 }
-#T_09544_row0_col1 {
+#T_891f1_row0_col1 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
   padding: 5px;
   min-width: 60px;
 }
-#T_09544_row0_col2 {
+#T_891f1_row0_col2 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -45,7 +45,7 @@ Computes the centroid along the time axis.
   white-space: normal;
   word-wrap: break-word;
 }
-#T_09544_row0_col3 {
+#T_891f1_row0_col3 {
   text-align: left;
   vertical-align: top;
   border: 1px solid #ddd;
@@ -56,21 +56,21 @@ Computes the centroid along the time axis.
   word-wrap: break-word;
 }
 </style>
-<table id="T_09544">
+<table id="T_891f1">
   <thead>
     <tr>
-      <th id="T_09544_level0_col0" class="col_heading level0 col0" >Parameter</th>
-      <th id="T_09544_level0_col1" class="col_heading level0 col1" >Type</th>
-      <th id="T_09544_level0_col2" class="col_heading level0 col2" >Default</th>
-      <th id="T_09544_level0_col3" class="col_heading level0 col3" >Description</th>
+      <th id="T_891f1_level0_col0" class="col_heading level0 col0" >Parameter</th>
+      <th id="T_891f1_level0_col1" class="col_heading level0 col1" >Type</th>
+      <th id="T_891f1_level0_col2" class="col_heading level0 col2" >Default</th>
+      <th id="T_891f1_level0_col3" class="col_heading level0 col3" >Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td id="T_09544_row0_col0" class="data row0 col0" >fs</td>
-      <td id="T_09544_row0_col1" class="data row0 col1" >int</td>
-      <td id="T_09544_row0_col2" class="data row0 col2" >Mandatory</td>
-      <td id="T_09544_row0_col3" class="data row0 col3" >Sampling frequency</td>
+      <td id="T_891f1_row0_col0" class="data row0 col0" >fs</td>
+      <td id="T_891f1_row0_col1" class="data row0 col1" >int</td>
+      <td id="T_891f1_row0_col2" class="data row0 col2" >Mandatory</td>
+      <td id="T_891f1_row0_col3" class="data row0 col3" >Sampling frequency</td>
     </tr>
   </tbody>
 </table>

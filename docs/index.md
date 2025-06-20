@@ -6,7 +6,7 @@ This Python library offers diverse solution for advanced time-series analysis. T
 
 ## What It Does
 
-`easyts` equips you with a robust set of features to master your time-series data:
+`easytime` equips you with a robust set of features to master your time-series data:
 
 * 📈 **Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
 
@@ -25,7 +25,7 @@ This Python library offers diverse solution for advanced time-series analysis. T
 Get started in seconds.
 
 ```bash
-pip install easyts 
+pip install easytime 
 ```
 
 ## Context

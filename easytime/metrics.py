@@ -147,7 +147,7 @@ def centroid(series, fs: int): # Series Centroid
 @staticmethod
 def info(): #Information
     print("\nSmall description of the features." \
-    "\nFor the full documentation see the library oficial website: https://franciscovmacieira.github.io/easyts/ or the library GitHub repository: https://github.com/franciscovmacieira/Deep-Time-Series-Analysis.git" \
+    "\nFor the full documentation see the library oficial website: https://franciscovmacieira.github.io/easytime/ or the library GitHub repository: https://github.com/franciscovmacieira/Deep-Time-Series-Analysis.git" \
     "\ntrend_strength: Computes the strength of a trend within the time-series." \
     "\nmedian_crosses: Counts the number of times the time-series crosses its median." \
     "\ntrend_changes: Detects the number of trend changes in the time-series." \

@@ -11,7 +11,7 @@ if PROJECT_ROOT not in sys.path:
 
 # --- Required Imports ---
 from datasetsforecast.m3 import M3
-from src.metrics import (
+from easytime import (
     trend_strength,
     trend_changes,
     linear_regression_slope,

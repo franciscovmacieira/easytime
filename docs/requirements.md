@@ -1,7 +1,7 @@
 # Requirements
 
 ## Core Dependencies
-The following packages are required to run EasyTest:
+The following packages are required to run easytime:
 
 - numpy~=1.26.4
 - antropy~=0.1.9

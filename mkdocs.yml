@@ -1,5 +1,5 @@
 site_name: "Easy to Explain: Time-Series Features"
-site_url: https://franciscovmacieira.github.io/easyts/
+site_url: https://franciscovmacieira.github.io/easytime/
 nav:
     - Home:
         - Overview: index.md 

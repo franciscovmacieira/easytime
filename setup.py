@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='easyts',
+    name='easytime',
     version='0.1.0',
     packages=find_packages(),
     install_requires=[
@@ -19,7 +19,7 @@ setup(
     description='A package for analysing different caractheristics of time series data.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/franciscovmacieira/Deep-Time-Series-Analysis.git',
+    url='https://github.com/franciscovmacieira/easytime.git',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
