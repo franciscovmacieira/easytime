@@ -13,5 +13,6 @@ from .metrics import (
     complexity,
     rec_concentration,
     centroid,
-    info
+    info,
+    all_metrics
 )
