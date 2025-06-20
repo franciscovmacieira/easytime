@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='easyts',
     version='0.1.0',
-    packages=find_packages(where='src'),
+    packages=find_packages(where='src/metrics.py'),
     install_requires=[
         'numpy~=1.26.4',
         'antropy~=0.1.9',

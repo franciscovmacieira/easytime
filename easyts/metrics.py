@@ -166,6 +166,22 @@ def info(): #Information
     "\nrec_concentration: Computes the relative position of the most frequent values in relation to the mean." \
     "\ncentroid: Computes the centroid of the time-series.\n" \
     )
+
+def all_metrics(series, sf):
+    return trend_strength(series), \
+            trend_changes(series), \
+            linear_regression_slope(series), \
+            linear_regression_r2(series), \
+            forecastability(series, sf), \
+            fluctuation(series), \
+            ac_relevance(series), \
+            seasonal_strength(series), \
+            window_fluctuation(series), \
+            st_variation(series), \
+            diff_series(series), \
+            complexity(series), \
+            rec_concentration(series), \
+            centroid(series, sf)
     
 
 

@@ -149,4 +149,6 @@ dmypy.json
 # Custom Ignores
 easyts.egg-info/
 mkdocs_prompts.txt
+pytest.ipynb
+
 
