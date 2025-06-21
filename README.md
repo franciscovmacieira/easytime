@@ -8,7 +8,7 @@ To acess the full documentation, visit our official website: https://franciscovm
 
 ## What It Does
 
-`easytime` equips you with a robust set of features to master your time-series data:
+`ete_ts` equips you with a robust set of features to master your time-series data:
 
 **Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
 
@@ -27,7 +27,7 @@ To acess the full documentation, visit our official website: https://franciscovm
 Get started in seconds.
 
 ```bash
-pip install easytime
+pip install ete_ts
 ```
 
 ## Context
