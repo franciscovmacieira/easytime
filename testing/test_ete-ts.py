@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 from datasetsforecast.m3 import M3
-from easytime import (
+from ete_ts import (
     trend_strength,
     trend_changes,
     linear_regression_slope,
