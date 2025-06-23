@@ -1,0 +1,458 @@
+Ranked Feature Correlations (Absolute Values)
+=============================================
+
+Rank 1:
+  - Feature 1: Series Centroid
+  - Feature 2: Trend Changes
+  - Correlation: 0.839890
+
+Rank 2:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Linear Regression R2
+  - Correlation: 0.837474
+
+Rank 3:
+  - Feature 1: Series Fluctuation
+  - Feature 2: Series Forecastability
+  - Correlation: 0.815611
+
+Rank 4:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Series Complexity
+  - Correlation: 0.786881
+
+Rank 5:
+  - Feature 1: Series Complexity
+  - Feature 2: Trend Strength
+  - Correlation: 0.768750
+
+Rank 6:
+  - Feature 1: Series Complexity
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.734405
+
+Rank 7:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Trend Strength
+  - Correlation: 0.730051
+
+Rank 8:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Series Complexity
+  - Correlation: 0.710524
+
+Rank 9:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Trend Strength
+  - Correlation: 0.701349
+
+Rank 10:
+  - Feature 1: Series Complexity
+  - Feature 2: Series Forecastability
+  - Correlation: 0.665942
+
+Rank 11:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.657008
+
+Rank 12:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Series Forecastability
+  - Correlation: 0.620396
+
+Rank 13:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Series Forecastability
+  - Correlation: 0.613847
+
+Rank 14:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.601189
+
+Rank 15:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Series Centroid
+  - Correlation: 0.557104
+
+Rank 16:
+  - Feature 1: Trend Changes
+  - Feature 2: Trend Strength
+  - Correlation: 0.519787
+
+Rank 17:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Series Centroid
+  - Correlation: 0.516561
+
+Rank 18:
+  - Feature 1: Series Centroid
+  - Feature 2: Trend Strength
+  - Correlation: 0.510533
+
+Rank 19:
+  - Feature 1: Series Fluctuation
+  - Feature 2: Trend Strength
+  - Correlation: 0.498745
+
+Rank 20:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Trend Changes
+  - Correlation: 0.442253
+
+Rank 21:
+  - Feature 1: Series Forecastability
+  - Feature 2: Trend Strength
+  - Correlation: 0.438431
+
+Rank 22:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.396077
+
+Rank 23:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Series Complexity
+  - Correlation: 0.339911
+
+Rank 24:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Series Centroid
+  - Correlation: 0.323684
+
+Rank 25:
+  - Feature 1: Series Centroid
+  - Feature 2: Series Complexity
+  - Correlation: 0.318828
+
+Rank 26:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Linear Regression Slope
+  - Correlation: 0.308704
+
+Rank 27:
+  - Feature 1: Series Centroid
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.305253
+
+Rank 28:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Linear Regression Slope
+  - Correlation: 0.282075
+
+Rank 29:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Seasonal Strength
+  - Correlation: 0.279842
+
+Rank 30:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Series Complexity
+  - Correlation: 0.267232
+
+Rank 31:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.262692
+
+Rank 32:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.257854
+
+Rank 33:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Trend Strength
+  - Correlation: 0.257269
+
+Rank 34:
+  - Feature 1: Trend Strength
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.238191
+
+Rank 35:
+  - Feature 1: Series Centroid
+  - Feature 2: Series Forecastability
+  - Correlation: 0.223455
+
+Rank 36:
+  - Feature 1: Series Complexity
+  - Feature 2: Trend Changes
+  - Correlation: 0.220690
+
+Rank 37:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.220430
+
+Rank 38:
+  - Feature 1: Series Fluctuation
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.216394
+
+Rank 39:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Series Forecastability
+  - Correlation: 0.215968
+
+Rank 40:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Series Forecastability
+  - Correlation: 0.212330
+
+Rank 41:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Trend Changes
+  - Correlation: 0.212120
+
+Rank 42:
+  - Feature 1: Series Fluctuation
+  - Feature 2: Trend Changes
+  - Correlation: 0.210677
+
+Rank 43:
+  - Feature 1: Series Complexity
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.205956
+
+Rank 44:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Trend Changes
+  - Correlation: 0.202001
+
+Rank 45:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.199953
+
+Rank 46:
+  - Feature 1: Series Forecastability
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.186940
+
+Rank 47:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Seasonal Strength
+  - Correlation: 0.185364
+
+Rank 48:
+  - Feature 1: Records Concentration
+  - Feature 2: Series Complexity
+  - Correlation: 0.168260
+
+Rank 49:
+  - Feature 1: Records Concentration
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.159990
+
+Rank 50:
+  - Feature 1: Differenced Series
+  - Feature 2: Series Fluctuation
+  - Correlation: 0.135648
+
+Rank 51:
+  - Feature 1: Differenced Series
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.122695
+
+Rank 52:
+  - Feature 1: Series Forecastability
+  - Feature 2: Trend Changes
+  - Correlation: 0.107899
+
+Rank 53:
+  - Feature 1: Records Concentration
+  - Feature 2: Trend Strength
+  - Correlation: 0.104494
+
+Rank 54:
+  - Feature 1: Records Concentration
+  - Feature 2: Series Forecastability
+  - Correlation: 0.101933
+
+Rank 55:
+  - Feature 1: Records Concentration
+  - Feature 2: Series Centroid
+  - Correlation: 0.098994
+
+Rank 56:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Trend Strength
+  - Correlation: 0.097391
+
+Rank 57:
+  - Feature 1: Short-Term Variation
+  - Feature 2: Trend Strength
+  - Correlation: 0.092828
+
+Rank 58:
+  - Feature 1: Series Complexity
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.092102
+
+Rank 59:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Records Concentration
+  - Correlation: 0.082960
+
+Rank 60:
+  - Feature 1: Differenced Series
+  - Feature 2: Seasonal Strength
+  - Correlation: 0.075087
+
+Rank 61:
+  - Feature 1: Records Concentration
+  - Feature 2: Trend Changes
+  - Correlation: 0.073093
+
+Rank 62:
+  - Feature 1: Short-Term Variation
+  - Feature 2: Trend Changes
+  - Correlation: 0.073013
+
+Rank 63:
+  - Feature 1: Differenced Series
+  - Feature 2: Series Centroid
+  - Correlation: 0.069658
+
+Rank 64:
+  - Feature 1: Series Centroid
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.068267
+
+Rank 65:
+  - Feature 1: Records Concentration
+  - Feature 2: Seasonal Strength
+  - Correlation: 0.067122
+
+Rank 66:
+  - Feature 1: Differenced Series
+  - Feature 2: Series Forecastability
+  - Correlation: 0.065851
+
+Rank 67:
+  - Feature 1: Differenced Series
+  - Feature 2: Linear Regression Slope
+  - Correlation: 0.065502
+
+Rank 68:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.064999
+
+Rank 69:
+  - Feature 1: Differenced Series
+  - Feature 2: Series Complexity
+  - Correlation: 0.064725
+
+Rank 70:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.064623
+
+Rank 71:
+  - Feature 1: Series Centroid
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.063254
+
+Rank 72:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Records Concentration
+  - Correlation: 0.056830
+
+Rank 73:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Trend Changes
+  - Correlation: 0.055848
+
+Rank 74:
+  - Feature 1: Differenced Series
+  - Feature 2: Records Concentration
+  - Correlation: 0.053134
+
+Rank 75:
+  - Feature 1: Linear Regression R2
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.050596
+
+Rank 76:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Records Concentration
+  - Correlation: 0.049862
+
+Rank 77:
+  - Feature 1: Records Concentration
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.047879
+
+Rank 78:
+  - Feature 1: Series Fluctuation
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.047197
+
+Rank 79:
+  - Feature 1: Differenced Series
+  - Feature 2: Trend Changes
+  - Correlation: 0.041550
+
+Rank 80:
+  - Feature 1: Differenced Series
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.041029
+
+Rank 81:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.040014
+
+Rank 82:
+  - Feature 1: Series Forecastability
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.039354
+
+Rank 83:
+  - Feature 1: Short-Term Variation
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.037445
+
+Rank 84:
+  - Feature 1: Differenced Series
+  - Feature 2: Trend Strength
+  - Correlation: 0.031444
+
+Rank 85:
+  - Feature 1: Records Concentration
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.027879
+
+Rank 86:
+  - Feature 1: Autocorrelation Relevance
+  - Feature 2: Differenced Series
+  - Correlation: 0.027215
+
+Rank 87:
+  - Feature 1: Trend Changes
+  - Feature 2: Window Fluctuation
+  - Correlation: 0.026188
+
+Rank 88:
+  - Feature 1: Differenced Series
+  - Feature 2: Linear Regression R2
+  - Correlation: 0.020929
+
+Rank 89:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Series Centroid
+  - Correlation: 0.012271
+
+Rank 90:
+  - Feature 1: Seasonal Strength
+  - Feature 2: Short-Term Variation
+  - Correlation: 0.007256
+
+Rank 91:
+  - Feature 1: Linear Regression Slope
+  - Feature 2: Seasonal Strength
+  - Correlation: 0.002316
+

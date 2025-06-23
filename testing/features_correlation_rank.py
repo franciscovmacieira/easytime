@@ -17,8 +17,7 @@ from ete_ts import (
     diff_series,
     complexity,
     rec_concentration,
-    centroid,
-    info
+    centroid
 )
 
 # --- Path Setup ---

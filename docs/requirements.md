@@ -1,7 +1,7 @@
 # Requirements
 
 ## Core Dependencies
-The following packages are required to run easytime:
+The following packages are required to run ete_ts:
 
 - numpy~=1.26.4
 - antropy~=0.1.9

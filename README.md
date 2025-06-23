@@ -2,7 +2,7 @@
 
 This Python library offers diverse solution for advanced time-series analysis. This library is built to empower developers and data scientists by simplifying complex time-series tasks.
 
-To acess the full documentation, visit our official website: https://franciscovmacieira.github.io/easytime/
+To acess the full documentation, visit our official website: https://franciscovmacieira.github.io/ete_ts/
 
 ---
 

@@ -2,14 +2,14 @@
 
 ## Introduction
 
-This document provides a detailed reference for the `easytime` library API. It covers installation, basic usage, and a complete guide to all available functions for time-series feature extraction.
+This document provides a detailed reference for the `ete_ts` library API. It covers installation, basic usage, and a complete guide to all available functions for time-series feature extraction.
 
 ## Installation
 
 Install the library from PyPI using pip:
 
 ```bash
-pip install easytime
+pip install ete_ts
 ```
 
 ## Basic Usage
@@ -17,14 +17,14 @@ pip install easytime
 To get started, import the library and a numerical package like NumPy. Then you can call any feature-extraction function with your time-series data.
 
 ```python
-import easytime
+import ete_ts
 import numpy as np
 
 # Create a sample time-series
 my_series = np.array([1, 2, 4, 8, 12, 18, 25, 33, 45, 58])
 
 # Calculate a feature
-slope = easytime.linear_regression_slope(my_series)
+slope = ete_ts.linear_regression_slope(my_series)
 
 print(f"The slope of the series is: {slope}")
 ```
@@ -41,81 +41,81 @@ The library uses standard Python exceptions to report errors. The most common ar
 
 #### trend_strength(series, period=1, seasonal=7, robust=False)
 ```python
-strength = easytime.trend_strength(my_series)
+strength = ete_ts.trend_strength(my_series)
 ```
 
 #### trend_changes(series, model="l2", min_size=2, jump=5, params=None, custom_cost=None)
 ```python
-changes = easytime.trend_changes(my_series)
+changes = ete_ts.trend_changes(my_series)
 ```
 
 #### linear_regression_slope(series)
 ```python
-slope = easytime.linear_regression_slope(my_series)
+slope = ete_ts.linear_regression_slope(my_series)
 ```
 
 #### linear_regression_r2(series)
 ```python
-r2_score = easytime.linear_regression_r2(my_series)
+r2_score = ete_ts.linear_regression_r2(my_series)
 ```
 
 #### forecastability(series, sf, method="welch", nperseg=None, normalize=False)
 ```python
-entropy = easytime.forecastability(my_series, sf=1.0)
+entropy = ete_ts.forecastability(my_series, sf=1.0)
 ```
 
 #### fluctuation(series)
 ```python
-fluc = easytime.fluctuation(my_series)
+fluc = ete_ts.fluctuation(my_series)
 ```
 
 #### window_fluctuation(series)
 ```python
-win_fluc = easytime.window_fluctuation(my_series)
+win_fluc = ete_ts.window_fluctuation(my_series)
 ```
 
 #### seasonal_strength(series, period=1, seasonal=7, robust=False)
 ```python
-season_str = easytime.seasonal_strength(my_series)
+season_str = ete_ts.seasonal_strength(my_series)
 ```
 
 #### ac_relevance(series)
 ```python
-relevance = easytime.ac_relevance(my_series)
+relevance = ete_ts.ac_relevance(my_series)
 ```
 
 #### st_variation(series)
 ```python
-variation = easytime.st_variation(my_series)
+variation = ete_ts.st_variation(my_series)
 ```
 
 #### diff_series(series)
 ```python
-diff_acf = easytime.diff_series(my_series)
+diff_acf = ete_ts.diff_series(my_series)
 ```
 
 #### complexity(series)
 ```python
-comp = easytime.complexity(my_series)
+comp = ete_ts.complexity(my_series)
 ```
 
 #### rec_concentration(series)
 ```python
-concentration = easytime.rec_concentration(my_series)
+concentration = ete_ts.rec_concentration(my_series)
 ```
 
 #### centroid(series, fs=1)
 ```python
-spec_centroid = easytime.centroid(my_series, fs=1)
+spec_centroid = ete_ts.centroid(my_series, fs=1)
 ```
 
 #### info()
 ```python
-easytime.info()
+ete_ts.info()
 ```
 
 #### all_metrics(series, fs=1)
 ```python
-outputs = easytime.all_metrics(my_series, fs=1)
+outputs = ete_ts.all_metrics(my_series, fs=1)
 ```
     

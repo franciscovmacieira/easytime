@@ -1,19 +1,19 @@
-# NOTICE for easytime Library
+# NOTICE for ete_ts Library
 
-This document lists third-party software components adapted for use within the easytime library, along with their original licenses.
+This document lists third-party software components adapted for use within the ete_ts library, along with their original licenses.
 
-**easytime Project License:**
+**ete_ts Project License:**
 
-The easytime library as a whole is licensed under the **GNU General Public License, Version 3 or later (GPLv3+)**. This is necessary because easytime incorporates code adapted from the `pycatch22` library, which is licensed under the GPLv3.
+The ete_ts library as a whole is licensed under the **GNU General Public License, Version 3 or later (GPLv3+)**. This is necessary because ete_ts incorporates code adapted from the `pycatch22` library, which is licensed under the GPLv3.
 
-Copyright (C) 2025 Francisco Macieira / easytime
+Copyright (C) 2025 Francisco Macieira / ete_ts
 
-easytime is free software: you can redistribute it and/or modify
+ete_ts is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-easytime is distributed in the hope that it will be useful,
+ete_ts is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
@@ -25,7 +25,7 @@ along with this program (see LICENSE file). If not, see <http://www.gnu.org/lice
 
 ## Included Third-Party Code
 
-The easytime library incorporates code adapted from the following projects. The original license texts are included below. Modifications have been made by Francisco Macieira / easytime.
+The ete_ts library incorporates code adapted from the following projects. The original license texts are included below. Modifications have been made by Francisco Macieira / ete_ts.
 
 ---
 
@@ -64,7 +64,7 @@ Unless required by applicable law or agreed to in writing, softwaredistributed u
 * **Copyright:** Copyright (C) 2007 DynamicsAndNeuralSystems
 * **License:** GNU General Public License, Version 3 (GPLv3)
 * **Source:** <https://github.com/DynamicsAndNeuralSystems/pycatch22>
-* **Impact:** Inclusion of code adapted from this library requires the easytime library to be licensed under GPLv3 or later.
+* **Impact:** Inclusion of code adapted from this library requires the ete_ts library to be licensed under GPLv3 or later.
 
                 GNU GENERAL PUBLIC LICENSE
                    Version 3, 29 June 2007
