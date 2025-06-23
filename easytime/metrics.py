@@ -9,7 +9,7 @@ import tsfel
 
 # Trend Analysis
 
-def trend_strength(series, period=12, seasonal=7, robust=False): # Trend Strength
+def trend_strength(series: np.ndarray, period: int=12, seasonal: int=7, robust: bool=False) -> float: # Trend Strength
     stl_sm = STL(series, period=period, seasonal=seasonal, robust=robust)
     res_sm = stl_sm.fit()
     remainder = res_sm.resid; deseason = series - res_sm.seasonal
@@ -18,7 +18,7 @@ def trend_strength(series, period=12, seasonal=7, robust=False): # Trend Strengt
     else: trend_strength = max(0., min(1., 1. - (vare / vardeseason if vardeseason > 1e-10 else 1e-10)))
     return trend_strength
 
-def trend_changes(series, model="l2", custom_cost=None, min_size=2, jump=5, params=None): # Trend Changes
+def trend_changes(series: np.ndarray, model: str ="l2", custom_cost=None, min_size: int=2, jump: int=5, params: dict=None) -> int: # Trend Changes
     pelt_instance = Pelt(model=model, custom_cost=custom_cost, min_size=min_size, jump=jump,params=params)
     pen_value = np.log(len(series)) if len(series) > 1 else 0
     algo = pelt_instance.fit(series)
@@ -26,14 +26,14 @@ def trend_changes(series, model="l2", custom_cost=None, min_size=2, jump=5, para
     num_changepoints = len(bkps) - 1 if bkps else 0
     return num_changepoints
 
-def linear_regression_slope(series): # Linear Regression Slope
+def linear_regression_slope(series: np.ndarray) -> float: # Linear Regression Slope
     lr_model_instance = SkLearnLinearRegression()
     time_steps = np.arange(len(series)).reshape(-1, 1)
     lr_model_instance.fit(time_steps, series)
     slope = lr_model_instance.coef_[0] if lr_model_instance.coef_.size > 0 else np.nan
     return slope
 
-def linear_regression_r2(series): # Linear Regression R2
+def linear_regression_r2(series: np.ndarray) -> float: # Linear Regression R2
     lr_model_instance = SkLearnLinearRegression()
     time_steps = np.arange(len(series)).reshape(-1, 1)
     lr_model_instance.fit(time_steps, series)
@@ -42,11 +42,11 @@ def linear_regression_r2(series): # Linear Regression R2
 
 # Noise/Complexity
 
-def forecastability(series, sf, method="welch", nperseg=None, normalize=False): # Series Forecastabality
+def forecastability(series: np.ndarray, sf: float, method: str ="welch", nperseg: int = None, normalize: bool =False) -> float: # Series Forecastabality
     spec_entropy = ant.spectral_entropy(series, sf=sf, method=method, nperseg=nperseg, normalize=normalize)
     return 1/spec_entropy
 
-def fluctuation(series): # Series Fluctuation
+def fluctuation(series: np.ndarray) -> float: # Series Fluctuation
     series_list = series.tolist()
     catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
     feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
@@ -55,14 +55,14 @@ def fluctuation(series): # Series Fluctuation
 
 # Seasonality Detection
 
-def ac_relevance(series): # AutoCorrelation Relevance
+def ac_relevance(series: np.ndarray) -> float: # AutoCorrelation Relevance
     series_list = series.tolist()
     catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
     feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
     e_crossing = feature_dict.get('CO_f1ecac', np.nan)
     return e_crossing
 
-def seasonal_strength(series, period=12, seasonal=7, robust=False): # Seasonal Strength
+def seasonal_strength(series: np.ndarray, period: int=12, seasonal: int=7, robust: bool=False) -> float: # Seasonal Strength
     stl_sm = STL(series, period=period, seasonal=seasonal, robust=robust)
     res_sm = stl_sm.fit()
     remainder = res_sm.resid
@@ -76,7 +76,7 @@ def seasonal_strength(series, period=12, seasonal=7, robust=False): # Seasonal S
 
 # Volatility/Outliers
 
-def window_fluctuation(series): # Window Fluctuation
+def window_fluctuation(series: np.ndarray) -> float: # Window Fluctuation
     series_list = series.tolist()
     catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
     feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
@@ -85,19 +85,19 @@ def window_fluctuation(series): # Window Fluctuation
 
 # Model Selection
 
-def st_variation(series): # Short-Term Variation
+def st_variation(series: np.ndarray) -> float: # Short-Term Variation
     series_list = series.tolist()
     catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
     feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
     variation = feature_dict.get('CO_trev_1_num', np.nan)
     return variation
 
-def diff_series(series): # Differenced Series
+def diff_series(series: np.ndarray) -> float: # Differenced Series
     result_dict = tsfeatures.acf_features(series)
     diff = result_dict['diff1_acf10']
     return diff
 
-def complexity(series) -> float: # Series Complexity
+def complexity(series: np.ndarray) -> float: # Series Complexity
     """
     Calculates the Complexity Estimate (CE) for the time series.
     This CE is a measure of the complexity of a single time series, as defined
@@ -131,14 +131,14 @@ def complexity(series) -> float: # Series Complexity
 
 # Clustering/Classification
 
-def rec_concentration(series): # Records Concentration
+def rec_concentration(series: np.ndarray) -> float: # Records Concentration
     series_list = series.tolist()
     catch22_raw_results = pycatch22.catch22_all(series_list, catch24=False)
     feature_dict = dict(zip(catch22_raw_results['names'], catch22_raw_results['values']))
     concentration = feature_dict.get('DN_HistogramMode_10', np.nan)
     return concentration
 
-def centroid(series, fs: int): # Series Centroid
+def centroid(series: np.ndarray, fs: int) -> float: # Series Centroid
     centroid_value = tsfel.feature_extraction.features.calc_centroid(series, fs)
     return float(centroid_value)
 
@@ -167,7 +167,7 @@ def info(): #Information
     "\ncentroid: Computes the centroid of the time-series.\n" \
     )
 
-def all_metrics(series, sf):
+def all_metrics(series: np.ndarray, sf: float):
     return trend_strength(series), \
             trend_changes(series), \
             linear_regression_slope(series), \

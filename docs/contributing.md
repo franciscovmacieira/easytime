@@ -24,17 +24,17 @@ If you are proposing a feature:
 
 ## Get Started!
 
-Ready to contribute to `easytime`? Here's how to set up your local development environment.
+Ready to contribute to `ete_ts`? Here's how to set up your local development environment.
 
 ### 1. Fork and Clone the Repository
 
-First, navigate to the `easytime` GitHub repository and click the "**Fork**" button in the top-right corner. This creates your own copy of the project.
+First, navigate to the `ete_ts` GitHub repository and click the "**Fork**" button in the top-right corner. This creates your own copy of the project.
 
 Next, clone your forked repository to your local machine. Replace `[Your-GitHub-Username]` with your actual username.
 
 ```console
-git clone [https://github.com/](https://github.com/)[Your-GitHub-Username]/easytime.git
-cd easytime
+git clone [https://github.com/](https://github.com/)[Your-GitHub-Username]/ete_ts.git
+cd ete_ts
 ```
 
 ### 2. Create and Activate a Virtual Environment
@@ -54,7 +54,7 @@ venv\Scripts\activate
 
 ### 3. Install Dependencies in Editable Mode
 
-Install the required packages from the `requirements.txt` file. Then, install `easytime` itself in "editable" mode (`-e .`) so your code changes take effect immediately.
+Install the required packages from the `requirements.txt` file. Then, install `ete_ts` itself in "editable" mode (`-e .`) so your code changes take effect immediately.
 
 ```console
 # Install dependencies
@@ -97,7 +97,7 @@ git push origin name-of-your-bugfix-or-feature
 
 ### 7. Open a Pull Request
 
-Finally, go to your fork on GitHub. You should see a prompt to "**Compare & pull request**". Click it, review your changes, and submit the pull request to the main `easytime` repository.
+Finally, go to your fork on GitHub. You should see a prompt to "**Compare & pull request**". Click it, review your changes, and submit the pull request to the main `ete_ts` repository.
 
 Before you submit a pull request, check that it meets these guidelines:
 

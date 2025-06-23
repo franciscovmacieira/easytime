@@ -2,13 +2,13 @@
 
 This Python library offers diverse solution for advanced time-series analysis. This library is built to empower developers and data scientists by simplifying complex time-series tasks.
 
-To acess the full documentation, visit our official website: https://franciscovmacieira.github.io/easytime/
+To acess the full documentation, visit our official website: https://franciscovmacieira.github.io/ete_ts/
 
 ---
 
 ## What It Does
 
-`easytime` equips you with a robust set of features to master your time-series data:
+`ete_ts` equips you with a robust set of features to master your time-series data:
 
 **Trend Analysis:** Quantify the direction, strength, and stability of the trend in your time-series.
 
@@ -27,7 +27,7 @@ To acess the full documentation, visit our official website: https://franciscovm
 Get started in seconds.
 
 ```bash
-pip install easytime
+pip install ete_ts
 ```
 
 ## Context
