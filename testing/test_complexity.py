@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datasetsforecast.m3 import M3
-from ete_ts import complexity
 import sys
 import os
 import random
@@ -13,6 +12,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
     print(f"Added to sys.path: {PROJECT_ROOT}")
 
+from ete_ts.metrics import complexity
 
 def test_complexity_analysis():
     """
